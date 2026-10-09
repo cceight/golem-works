@@ -1,0 +1,1368 @@
+<title>無限ゴーレム工房</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 一画面の工房卓。上に指示バー、左に工房と手札、右に素材皿・工房の状況・記録。カードの詳細はマウスを乗せたときだけ浮かぶ。狭い画面では縦に積む。
+   Look: 地下鉱山の蒸気工房。岩肌の坑道にランタンの灯り、鋲打ちの鉄板パネル、真鍮の金具、鉱石色の素材。暗色1種で固定。 */
+:root{
+  --ground:#14100c; --panel:#211a14; --sunk:#2b221a; --ink:#efe3cf; --muted:#a8977f; --line:#4a3b2c;
+  --accent:#d6a04a; --accent-ink:#1b1209; --warn:#ec7b45;
+  --brass:#d6a04a; --brass-dk:#8c6127; --iron:#2a221b; --iron-hi:#3a2f24; --rivet:#9d7a4a;
+  --wood:#79c86c; --fire:#f27350; --earth:#dcaa60; --metal:#bcc6d0; --water:#6ea8ec;
+  --p0:#d6a04a; --p1:#e9809f; --p2:#ad93f2; --p3:#76d0bd; --p4:#79b8e0; --none:#b98ff2; --on-el:#16110c;
+  --display:"Dela Gothic One","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",monospace;
+  --r:8px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.55;padding-inline:16px;padding-block:12px 32px}
+button{font:inherit;color:inherit}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding-block:6px}
+.brand{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:.04em;margin:0}
+.brand small{display:block;font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:.18em;color:var(--muted)}
+.meter{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:12.5px;white-space:nowrap}
+.chip b{font-family:var(--mono);font-weight:600}
+.chip.now{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn.toggle[aria-pressed="false"]{color:var(--muted)}
+.spacer{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);padding:7px 14px;border-radius:8px;cursor:pointer;font-weight:500}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:700}
+.btn.small{padding:3px 9px;font-size:12px;border-radius:6px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;align-items:start;--cw:124px;--ah:54px;--ch:212px}
+.grid.draft{--cw:118px;--ah:50px;--ch:204px}
+.grid.play{--cw:124px;--ah:54px;--ch:212px}
+.grid.draft .dishpanel{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+svg.dishes{max-width:200px;margin:0 auto;transition:max-width .25s ease}
+.grid.draft svg.dishes{max-width:230px}
+.dishpanel{padding:10px 12px}
+.dishpanel h2 .sub{display:none}
+.grid.draft .dishpanel h2 .sub{display:inline}
+.rightband{position:sticky;top:88px;max-height:calc(100vh - 100px);overflow:auto;gap:12px}
+.rightband .log{max-height:none}
+.fx-dot{position:fixed;z-index:25;width:18px;height:18px;border-radius:50%;color:var(--brass);pointer-events:none;box-shadow:0 0 0 2px var(--panel),0 2px 8px rgba(0,0,0,.25)}
+@media (max-width:1100px){.grid,.grid.draft,.grid.play{grid-template-columns:minmax(0,1fr) 250px}}
+@media (max-width:760px){.grid,.grid.draft,.grid.play{grid-template-columns:minmax(0,1fr)}.rightband{position:static;max-height:none;overflow:visible}.leftcol{order:3}.logcol{order:2}svg.dishes,.grid.draft svg.dishes{max-width:220px}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;min-width:0}
+.panel h2{font-family:var(--display);font-size:15px;font-weight:700;margin:0 0 8px;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.panel h2 .sub{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:0}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.banner{border-radius:var(--r);padding:10px 14px;background:var(--sunk);border:1px dashed var(--accent);font-weight:500}
+.banner.warn{border-color:var(--warn);color:var(--warn)}
+svg.dishes{width:100%;height:auto;display:block}
+.dish circle.base{stroke-width:2}
+.dish.ok{cursor:pointer}
+.dish.ok circle.base{stroke-width:3.5}
+.dish.ok:hover circle.base{filter:brightness(1.08)}
+.dish text{font-family:var(--mono)}
+.res{display:flex;flex-wrap:wrap;gap:6px}
+.r{display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:2px 8px;font-family:var(--mono);font-weight:600;font-size:13px;border:1px solid}
+.r .k{font-family:var(--body);font-weight:700}
+.r button{border:0;background:transparent;cursor:pointer;padding:0 2px;font-size:13px;line-height:1;color:var(--muted)}
+.r button:disabled{opacity:.3;cursor:not-allowed}
+.e-none{--c:var(--none)} .e-start{--c:var(--muted)} .e-wood{--c:var(--wood)} .e-fire{--c:var(--fire)} .e-earth{--c:var(--earth)} .e-metal{--c:var(--metal)} .e-water{--c:var(--water)}
+.r{color:var(--c);border-color:color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--c) 10%,transparent)}
+.who{display:flex;flex-direction:column;gap:10px}
+.pl{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:var(--panel)}
+.pl.active{border-color:var(--pc);box-shadow:inset 3px 0 0 var(--pc)}
+.pl .row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pl .nm{font-weight:700;color:var(--pc)}
+.pl .stat{font-size:12px;color:var(--muted)}
+.pl .stat b{font-family:var(--mono);color:var(--ink)}
+.golems{font-family:var(--mono);font-weight:600;font-size:15px}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:11px;padding:1px 6px;border-radius:4px;color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent);border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
+.tag.tap{opacity:.55;text-decoration:line-through}
+.cards{display:flex;flex-wrap:wrap;gap:8px}
+.slot{width:var(--cw);height:var(--ch);flex:none;position:relative;transition:width .25s ease,height .25s ease}
+.slot.tapped{width:var(--ch);height:var(--cw)}
+.slot .card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.slot .card.tapped{transform:translate(-50%,-50%) rotate(90deg)}
+.card{width:var(--cw);height:var(--ch);border-radius:9px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;overflow:hidden;position:relative;transition:transform .25s ease,box-shadow .15s}
+.card .band{height:6px;background:var(--c)}
+.card.starter{background:color-mix(in srgb,var(--muted) 7%,var(--panel))}
+.card .bd{padding:5px 7px 6px;display:flex;flex-direction:column;gap:4px;flex:1;justify-content:space-between}
+.card .art{position:relative}
+.card .art .cost{position:absolute;left:4px;top:4px}
+
+.cards .card .art{margin:4px 6px 0;font-size:9px}
+.hand .cards{display:grid;grid-template-columns:repeat(var(--n,7),minmax(0,128px));gap:8px}
+.hand .card{width:auto;height:auto}
+.hand .card{min-height:var(--ch)}
+.costrow{display:flex;gap:3px;flex-wrap:wrap;min-height:18px;margin:5px 6px 0}
+.cd{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--c);color:var(--on-el);font-family:var(--mono);font-weight:600;font-size:11px;line-height:1}
+.cards .card .tx{font-size:10.5px;line-height:1.4;color:var(--ink)}
+.card .art{height:var(--ah);margin:6px 8px 0;border-radius:6px;border:1px dashed color-mix(in srgb,var(--c,var(--muted)) 55%,transparent);
+  background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--c,var(--muted)) 14%,transparent) 0 6px,transparent 6px 12px),var(--sunk);
+  display:grid;place-items:center;font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted)}
+.card.ready{animation:card-blink 1s ease-in-out infinite alternate}
+@keyframes card-blink{from{box-shadow:0 0 0 2.5px var(--accent)}to{box-shadow:0 0 0 2.5px color-mix(in srgb,var(--accent) 15%,transparent)}}
+.hand .card.sel.ready{animation:none;box-shadow:0 0 0 2.5px var(--accent)}
+@media (prefers-reduced-motion:reduce){.card.ready{animation:none;box-shadow:0 0 0 2.5px var(--accent)}}
+.detail{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.detail .empty{padding:10px}
+.detail .band{height:6px}
+.detail .in{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.detail .nm{font-family:var(--display);font-weight:700;font-size:16px}
+.detail .role{font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.detail .tx{font-size:13.5px;line-height:1.6}
+.detail .note{font-size:12px;color:var(--warn)}
+.detail .cost{display:flex;gap:4px;flex-wrap:wrap}
+@media (min-width:761px){
+  html,body{height:100%}
+  body{padding-block:10px}
+  .app.game{height:calc(100dvh - 20px);gap:10px}
+  .app.game header.top{padding-block:0}
+  .app.game .brand{font-size:20px}
+  .app.game .grid{flex:1;min-height:0;align-items:stretch}
+  .app.game .grid>.col{min-height:0;overflow:auto}
+  .app.game .rightband{position:static;max-height:none}
+  .app.game .midcol{display:flex;flex-direction:column}
+  .app.game .tabpanel{flex:0 1 auto;min-height:0;overflow:auto}
+  .app.game .hand{flex:1 1 auto;min-height:0;overflow:auto}
+}
+.dlg.wide{max-width:720px}
+.dlg .opts button.pickcard{width:200px;padding:0;text-align:left;font-size:inherit;font-weight:400;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);overflow:hidden;display:flex;flex-direction:column}
+.dlg .opts button.pickcard:hover{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 30%,transparent)}
+.pickcard .band,.tip .band,.detail .band{height:6px;background:var(--c)}
+.pickcard .band.multi,.tip .band.multi{background-color:transparent}
+.pickcard .in{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.pickcard .nm{font-family:var(--display);font-weight:700;font-size:15px}
+.pickcard .role{font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.pickcard .tx{font-size:13px;line-height:1.55}
+.pickcard .cost{display:flex;gap:4px;flex-wrap:wrap}
+.counts{display:inline-flex;gap:8px;flex-wrap:wrap;margin-left:6px;font-family:var(--body);letter-spacing:0}
+.count{display:inline-flex;align-items:baseline;gap:4px;padding:2px 10px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);font-size:13px;font-weight:500;color:var(--muted)}
+.count b{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--ink);line-height:1.2}
+.count.golem{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.count.golem b{color:var(--accent)}
+.tip{position:fixed;z-index:30;width:250px;max-width:calc(100vw - 32px);background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);overflow:hidden;pointer-events:none}
+.tip .band{height:6px}
+.tip .in{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.tip .nm{font-family:var(--display);font-weight:700;font-size:15px}
+.tip .role{font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.tip .tx{font-size:13px;line-height:1.55}
+.tip .note{font-size:11.5px;color:var(--warn)}
+.tip .cost{display:flex;gap:4px;flex-wrap:wrap}
+.instr{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;padding:12px 16px;border-radius:var(--r);background:var(--panel);border:2px solid var(--line)}
+.instr b{font-family:var(--display);font-size:18px;letter-spacing:.04em}
+.instr span{color:var(--muted);font-size:13px}
+.instr-text{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;flex:1 1 320px;min-width:0}
+.instr-acts{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.instr.mine{border-color:var(--accent);animation:instr-blink 1.1s ease-in-out infinite alternate}
+.instr.mine b{color:var(--accent)}
+@keyframes instr-blink{from{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}to{border-color:color-mix(in srgb,var(--accent) 25%,var(--line));box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.instr.mine{animation:none}}
+.card .nm{font-family:var(--display);font-weight:700;font-size:11.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .role{font-size:10.5px;letter-spacing:.08em;color:var(--muted)}
+.card .tx{font-size:var(--tx);line-height:1.45;flex:1;min-height:0;overflow:auto}
+.card .cost{display:flex;gap:4px;flex-wrap:wrap}
+.card .cost .r{font-size:11px;padding:0 6px}
+.card .acts{display:flex;flex-wrap:wrap;gap:4px}
+.card .acts .btn.small{padding:2px 7px;font-size:11px;white-space:nowrap}
+.hand .card.sel{box-shadow:0 0 0 2.5px var(--accent);transform:translateY(-4px)}
+.hand .card.can{border-color:color-mix(in srgb,var(--accent) 60%,var(--line))}
+
+.empty{color:var(--muted);font-size:13px;padding:6px 0}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.log{max-height:640px;overflow:auto;display:flex;flex-direction:column;gap:3px;font-size:12.5px}
+.log .ln{padding:2px 0;border-bottom:1px dotted var(--line)}
+.log .ln.round{font-family:var(--display);font-weight:700;color:var(--accent);padding-top:8px}
+.log .ln.big{font-weight:700;color:var(--warn)}
+.setup{max-width:760px;margin:30px auto;display:flex;flex-direction:column;gap:16px}
+.setup h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,6vw,48px);margin:0;letter-spacing:.05em;text-wrap:balance}
+.setup h1 small{display:block;font-family:var(--body);font-weight:500;font-size:13px;letter-spacing:.32em;color:var(--muted);margin-top:4px}
+.setup .ask{font-weight:700}
+.modes.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.modes.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:480px){.modes.three{grid-template-columns:1fr}}
+.net{display:flex;flex-direction:column;gap:12px;max-width:520px}
+.net label{display:flex;flex-direction:column;gap:6px;font-weight:700}
+.net input{font:inherit;font-size:18px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.net input.code{font-family:var(--display);letter-spacing:.3em;text-transform:uppercase;max-width:220px}
+.net .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.net .err{color:#ff8a7a;font-weight:700}
+.roomcode{font-family:var(--display);font-size:clamp(40px,10vw,64px);letter-spacing:.25em;line-height:1}
+.members{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.members li{padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);display:flex;gap:8px;align-items:center}
+.members .tag2{font-size:12px;color:var(--muted)}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper b{font-size:22px;min-width:1.5em;text-align:center}
+.netbar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:40;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.modes.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:480px){.modes.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mode b{font-size:20px}
+.setup p{margin:0;max-width:62ch}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.mode{padding:14px;border-radius:var(--r);border:1px solid var(--line);background:var(--panel);cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:2px}
+.mode:hover{border-color:var(--accent)}
+.mode b{font-family:var(--display);font-size:17px}
+.mode span{font-size:12px;color:var(--muted)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.rules div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12.5px}
+.rules b{display:block;font-family:var(--display);font-size:13.5px;margin-bottom:2px}
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--ground) 70%,transparent);display:grid;place-items:center;padding:16px;z-index:10;backdrop-filter:blur(3px)}
+.dlg{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 40px rgba(0,0,0,.18)}
+.dlg h3{margin:0;font-family:var(--display);font-size:18px}
+.dlg .opts{display:flex;flex-wrap:wrap;gap:8px}
+.dlg .opts button{font-size:16px;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;border:1.5px solid var(--c);color:var(--c);background:color-mix(in srgb,var(--c) 10%,transparent)}
+.win{font-family:var(--display);font-weight:800;font-size:clamp(30px,7vw,52px);line-height:1.1;margin:0;color:var(--accent)}
+.rank{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.rank div{display:flex;gap:8px}
+.rank b{font-family:var(--mono)}
+.rb-scrim{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 28%,transparent);z-index:20}
+.rulebook{position:fixed;top:0;right:0;bottom:0;width:min(600px,100%);background:var(--panel);border-left:1px solid var(--line);z-index:21;display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(0,0,0,.16)}
+.rb-head{display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) 18px 12px;border-bottom:1px solid var(--line)}
+.rb-head h2{margin:0;font-family:var(--display);font-size:19px;letter-spacing:.06em}
+.rb-toc{display:flex;flex-wrap:wrap;gap:6px;padding:10px 18px;border-bottom:1px solid var(--line)}
+.rb-toc a{font-size:12.5px;color:var(--accent);text-decoration:none;padding:2px 8px;border:1px solid var(--line);border-radius:999px}
+.rb-toc a:hover{border-color:var(--accent)}
+.rb-body{overflow:auto;padding:6px 18px calc(28px + env(safe-area-inset-bottom,0px));font-size:13.5px;line-height:1.7}
+.rb-body section{padding-top:14px}
+.rb-body h3{font-family:var(--display);font-size:16px;margin:4px 0 6px;letter-spacing:.04em;text-wrap:balance}
+.rb-body h4{font-size:13.5px;margin:12px 0 4px}
+.rb-body p{margin:0 0 8px;max-width:62ch}
+.rb-body ol,.rb-body ul{margin:0 0 8px;padding-left:1.4em}
+.rb-body li{margin-bottom:3px}
+.rb-tbl{overflow-x:auto;margin:4px 0 10px}
+.rb-tbl table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:420px}
+.rb-tbl th,.rb-tbl td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+.rb-tbl th{font-weight:700;color:var(--muted);font-size:11.5px;letter-spacing:.06em}
+.rb-fig{max-width:340px;margin:4px 0 8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+
+/* ---- 地下鉱山の蒸気工房 ---- */
+body{
+  background-color:var(--ground);
+  background-image:
+    radial-gradient(ellipse 60% 45% at 12% -8%,rgba(255,176,90,.20),transparent 70%),
+    radial-gradient(ellipse 50% 40% at 92% 108%,rgba(255,130,60,.14),transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .44 0 0 0 0 .32 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg,#1a140f,#0f0c09);
+  background-attachment:fixed;
+}
+.panel,.dlg,.rulebook,.pl,.tip,.mode,.rules div{
+  background-color:var(--panel);
+  background-image:
+    radial-gradient(circle at 9px 9px,var(--rivet) 0 2px,rgba(0,0,0,.6) 2.6px,transparent 3.4px),
+    radial-gradient(circle at calc(100% - 9px) 9px,var(--rivet) 0 2px,rgba(0,0,0,.6) 2.6px,transparent 3.4px),
+    radial-gradient(circle at 9px calc(100% - 9px),var(--rivet) 0 2px,rgba(0,0,0,.6) 2.6px,transparent 3.4px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),var(--rivet) 0 2px,rgba(0,0,0,.6) 2.6px,transparent 3.4px),
+    linear-gradient(180deg,#2a2119,#1d1712);
+  border:1px solid var(--line);
+  box-shadow:inset 0 1px 0 rgba(255,220,170,.06),0 6px 18px rgba(0,0,0,.35);
+}
+.pl,.tip,.mode,.rules div{background-image:linear-gradient(180deg,#2a2119,#1d1712)}
+.panel h2,.dlg h3,.rb-head h2,.rb-body h3{font-family:var(--display);font-weight:400;color:var(--brass);letter-spacing:.08em;text-shadow:0 1px 0 #000,0 0 10px rgba(214,160,74,.18)}
+.panel h2 .sub{color:var(--muted);text-shadow:none}
+.brand{font-family:var(--display);font-weight:400;color:var(--brass);letter-spacing:.08em;text-shadow:0 2px 0 #000,0 0 18px rgba(214,160,74,.25)}
+.brand small{color:var(--muted);letter-spacing:.3em}
+.chip{background:linear-gradient(180deg,var(--iron-hi),var(--iron));border-color:var(--line);color:var(--muted)}
+.chip b{color:var(--ink)}
+.btn{background:linear-gradient(180deg,var(--iron-hi),var(--iron));border:1px solid var(--line);color:var(--ink);box-shadow:inset 0 1px 0 rgba(255,220,170,.08),0 2px 0 rgba(0,0,0,.5)}
+.btn:hover:not(:disabled){border-color:var(--brass);color:#fff3dc}
+.btn:active:not(:disabled){transform:translateY(1px);box-shadow:inset 0 1px 0 rgba(255,220,170,.08)}
+.btn.primary{background:linear-gradient(180deg,#f0c36b,#c08a35 55%,#8c6127);color:var(--accent-ink);border-color:#f3cf86;text-shadow:0 1px 0 rgba(255,240,200,.5);font-weight:700}
+.btn.primary:hover:not(:disabled){color:#120b04;filter:brightness(1.06)}
+.instr{background:linear-gradient(180deg,#3a2c1d,#241b13);border:2px solid var(--brass-dk);box-shadow:inset 0 1px 0 rgba(255,220,170,.12),0 6px 20px rgba(0,0,0,.45)}
+.instr b{color:var(--ink);font-family:var(--display);font-weight:400;letter-spacing:.06em}
+.instr .instr-text{position:relative;padding-left:22px}
+.instr .instr-text::before{content:"";position:absolute;left:0;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#5b4a37;box-shadow:inset 0 -2px 3px rgba(0,0,0,.6)}
+.instr.mine{border-color:var(--brass)}
+.instr.mine b{color:var(--brass)}
+.instr.mine .instr-text::before{background:#ffb347;box-shadow:0 0 10px 3px rgba(255,170,60,.7),inset 0 -2px 3px rgba(150,70,0,.5);animation:lamp 1.1s ease-in-out infinite alternate}
+@keyframes lamp{from{opacity:1}to{opacity:.35;box-shadow:0 0 2px 0 rgba(255,170,60,.3)}}
+@keyframes instr-blink{from{border-color:var(--brass);box-shadow:0 0 0 3px rgba(214,160,74,.28),0 6px 20px rgba(0,0,0,.45)}to{border-color:var(--brass-dk);box-shadow:0 6px 20px rgba(0,0,0,.45)}}
+@media (prefers-reduced-motion:reduce){.instr.mine .instr-text::before{animation:none}}
+.dishpanel{background-image:radial-gradient(circle at 50% 55%,rgba(255,170,80,.10),transparent 60%),linear-gradient(180deg,#2a2119,#1d1712)}
+.grid.draft .dishpanel{border-color:var(--brass);box-shadow:0 0 0 2px rgba(214,160,74,.25),0 6px 18px rgba(0,0,0,.35)}
+.dish circle.base{filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
+.dish.ok circle.base{filter:drop-shadow(0 0 7px rgba(255,190,110,.65))}
+.cards .card,.hand .card{background:linear-gradient(180deg,#2f251c,#221b15);border:1px solid #5a4733;box-shadow:inset 0 1px 0 rgba(255,220,170,.07),0 3px 8px rgba(0,0,0,.45)}
+.card.starter{background:linear-gradient(180deg,#2b2a28,#1f1e1c)}
+.card .band{box-shadow:inset 0 -1px 0 rgba(0,0,0,.4)}
+.cards .card .art{border-style:solid;border-color:color-mix(in srgb,var(--c) 40%,#000);background:
+  linear-gradient(color-mix(in srgb,var(--c) 18%,transparent) 1px,transparent 1px) 0 0/10px 10px,
+  linear-gradient(90deg,color-mix(in srgb,var(--c) 18%,transparent) 1px,transparent 1px) 0 0/10px 10px,
+  radial-gradient(ellipse at 50% 60%,color-mix(in srgb,var(--c) 22%,transparent),transparent 70%),#15110d;color:color-mix(in srgb,var(--c) 70%,var(--muted))}
+.card .nm{color:#f6e8cf}
+.hand .card.can{border-color:var(--brass-dk)}
+@keyframes card-blink{from{box-shadow:0 0 0 2.5px var(--brass),0 0 14px rgba(214,160,74,.45)}to{box-shadow:0 0 0 2.5px rgba(214,160,74,.15),0 3px 8px rgba(0,0,0,.45)}}
+.r{background:color-mix(in srgb,var(--c) 14%,#120d09)}
+.count{background:linear-gradient(180deg,#1a140f,#120e0a);border-color:var(--line);box-shadow:inset 0 2px 4px rgba(0,0,0,.6)}
+.count b{color:var(--ink)}
+.count.golem{border-color:var(--brass-dk);background:linear-gradient(180deg,#1a140f,#120e0a)}
+.count.golem b{color:var(--brass);text-shadow:0 0 8px rgba(214,160,74,.4)}
+.gear{width:16px;height:16px;align-self:center;fill:var(--brass);transition:transform .7s cubic-bezier(.3,1.5,.6,1)}
+.gear.spin{transform:rotate(180deg)}
+.pl{background-image:linear-gradient(180deg,#261e17,#1b1510)}
+.pl.active{border-color:var(--pc);box-shadow:inset 3px 0 0 var(--pc),0 0 12px color-mix(in srgb,var(--pc) 25%,transparent)}
+.log .ln{border-bottom-color:#3a2e22}
+.log .ln.round{color:var(--brass);font-family:var(--display);font-weight:400}
+.fx-dot{box-shadow:0 0 0 2px #1b140e,0 0 12px 2px currentColor}
+.overlay{background:rgba(10,7,4,.62)}
+.dlg{border-color:var(--brass-dk);box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.setup h1{font-family:var(--display);font-weight:400;color:var(--brass);text-shadow:0 3px 0 #000,0 0 30px rgba(214,160,74,.3)}
+.mode{border-color:var(--brass-dk)}
+.mode:hover{border-color:var(--brass);box-shadow:0 0 0 2px rgba(214,160,74,.2)}
+.mode b{font-family:var(--display);font-weight:400;color:var(--brass)}
+.win{font-family:var(--display);font-weight:400;color:var(--brass);text-shadow:0 0 20px rgba(214,160,74,.4)}
+.rulebook{border-left-color:var(--brass-dk)}
+.rb-toc a{color:var(--brass);border-color:var(--line)}
+.rb-tbl th{color:var(--brass)}
+.banner{background:#2b2119;border-color:var(--brass-dk)}
+.tip,.pickcard{border-color:var(--brass-dk)}
+.dlg .opts button.pickcard{background:linear-gradient(180deg,#2f251c,#221b15)}
+
+.sitter{display:inline-flex;align-self:center;margin:-11px 0 -9px -4px}
+.sitter svg{width:46px;height:46px;display:block;overflow:visible}
+.golem-art .g-head{transform-box:view-box;transform-origin:757px 925px}
+.golem-art.sit .g-head{transform-origin:172px 94px}
+.sitter .g-head{animation:golem-sway 3.4s ease-in-out infinite alternate}
+@keyframes golem-sway{0%{transform:rotate(-7deg)}45%{transform:rotate(-1deg)}55%{transform:rotate(1deg)}100%{transform:rotate(7deg)}}
+.fx-golem{position:fixed;z-index:26;width:46px;height:46px;pointer-events:none;will-change:transform,opacity}
+.fx-golem::before{content:'';position:absolute;left:-6px;right:-6px;top:4px;bottom:-4px;border-radius:50%;background:radial-gradient(closest-side,rgba(176,124,255,.4),rgba(176,124,255,0))}
+.fx-golem>div{position:absolute;inset:0}
+.fx-golem .gb{opacity:0}
+.fx-golem svg{width:100%;height:100%;display:block;overflow:visible}
+.pl .golems,.count.golem b{display:inline-block}
+@media (prefers-reduced-motion:reduce){.sitter .g-head{animation:none}}
+/* ---- スマホ（760px以下） ---- */
+@media (max-width:760px){
+  body{padding-inline:10px;padding-block:8px 24px;font-size:13px}
+  .app{gap:10px}
+  .instr{padding:8px 10px;gap:6px;border-radius:10px}
+  .instr b{font-size:15px}
+  .instr span{font-size:11px;line-height:1.45}
+  .instr-text{flex-basis:100%}
+  .instr-acts{margin-left:0;width:100%}
+  .instr-acts .btn{flex:1;padding:8px 10px}
+  header.top{gap:6px 8px}
+  .brand{font-size:17px}
+  .brand small{display:none}
+  .meter{gap:4px}
+  .chip{padding:2px 8px;font-size:11px}
+  header.top .spacer{display:none}
+  header.top{display:flex;flex-wrap:wrap;align-items:center}
+  header.top .brand{flex:1 1 auto}
+  header.top .meter{order:3;width:100%}
+  header.top .btn{padding:4px 8px;font-size:11.5px}
+  header.top .lg{display:none}
+  .grid,.grid.draft,.grid.play{grid-template-columns:minmax(0,1fr);gap:10px}
+  .grid.draft .rightband{order:-1}
+  .rightband{gap:10px}
+  .rightband .log{max-height:170px;overflow:auto}
+  .panel{padding:10px}
+  .panel h2{font-size:14px;flex-wrap:wrap}
+  .counts{margin-left:0}
+  .count{font-size:11.5px;padding:1px 8px}
+  .count b{font-size:16px}
+  .cards,.hand .cards{display:flex;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px;gap:8px;-webkit-overflow-scrolling:touch}
+  .cards>*{scroll-snap-align:start}
+  .grid,.grid.draft,.grid.play{--cw:104px;--ah:40px;--ch:178px}
+  .cards .card .tx{font-size:10px}
+  .cards .card .nm{font-size:11px}
+  .hand .card{width:var(--cw);flex:none;min-height:var(--ch)}
+  .who{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .pl{padding:6px 8px}
+  .pl .r{font-size:12px;padding:1px 6px}
+  svg.dishes,.grid.draft svg.dishes{max-width:220px}
+  .grid.play svg.dishes{max-width:170px}
+  .dlg{padding:14px;border-radius:12px}
+  .dlg h3{font-size:15px}
+  .dlg .opts button{font-size:14px;padding:8px 12px}
+  .dlg .opts button.pickcard{width:100%}
+  .tip.sheet{left:10px!important;right:10px;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:auto;max-width:none}
+  .setup{margin:16px auto}
+}
+</style>
+<div class="app" id="app"></div>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<pattern id="gSpeck" width="46" height="46" patternUnits="userSpaceOnUse"><circle cx="8" cy="10" r="2.6" fill="#1b1917"/><circle cx="31" cy="6" r="1.6" fill="#1b1917"/><circle cx="22" cy="28" r="3.2" fill="#1b1917"/><circle cx="40" cy="37" r="1.9" fill="#1b1917"/><circle cx="7" cy="39" r="1.5" fill="#1b1917"/><circle cx="35" cy="22" r="1.2" fill="#1b1917"/></pattern>
+<pattern id="gSpeckS" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="4.5" r="1.15" fill="#1b1917"/><circle cx="13.5" cy="3" r=".75" fill="#1b1917"/><circle cx="9.5" cy="12.5" r="1.4" fill="#1b1917"/><circle cx="17.5" cy="16" r=".85" fill="#1b1917"/><circle cx="3" cy="17" r=".7" fill="#1b1917"/></pattern>
+<linearGradient id="gShade" x1="0" x2="1" y1="0" y2=".3"><stop offset="0" stop-color="#fff" stop-opacity=".1"/><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".34"/></linearGradient>
+<radialGradient id="gCore" cx=".42" cy=".38"><stop offset="0" stop-color="#f6ecff"/><stop offset=".45" stop-color="#c79cff"/><stop offset="1" stop-color="#8a46f0"/></radialGradient>
+<radialGradient id="gCoreGlow"><stop offset="0" stop-color="#c9a0ff" stop-opacity=".75"/><stop offset=".5" stop-color="#9b5cff" stop-opacity=".25"/><stop offset="1" stop-color="#9b5cff" stop-opacity="0"/></radialGradient>
+</defs></svg>
+<div class="rb-scrim" id="rb-scrim" data-act="rules-close" hidden></div>
+<aside class="rulebook" id="rulebook" role="dialog" aria-modal="true" aria-labelledby="rb-title" hidden>
+  <div class="rb-head"><h2 id="rb-title">ルールブック</h2><span class="spacer"></span><button class="btn" data-act="rules-close" id="rb-close">閉じる</button></div>
+  <nav class="rb-toc" aria-label="ルールブックの目次"><a href="#rb-overview">概要</a><a href="#rb-round">ラウンドの流れ</a><a href="#rb-turn">ターンでできること</a><a href="#rb-named">ネームドゴーレム</a><a href="#rb-win">勝利条件</a><a href="#rb-terms">用語</a></nav>
+  <div class="rb-body" id="rb-body">
+    <section id="rb-overview"><h3>概要</h3>
+      <p>ゴーレムがゴーレムを作る工房を組み上げ、最初に無限ループを完成させたプレイヤーが勝ちます。12ラウンド以内に誰も完成しなければ、量産ゴーレムが最も多いプレイヤーの勝ちです。</p>
+      <p>人数は1〜5人。準備では手札5枚、各素材1個ずつ、素材所持上限10、手札上限7でスタートします。全員の工房には、最初から解体ゴーレム、廃材ゴーレム、試作工房の3枚の初期カードが置かれています。</p></section>
+    <section id="rb-round"><h3>ラウンドの流れ</h3>
+      <ol><li>補充：各皿の素材を「人数＋1個」になるまで補充する。</li>
+        <li>ドロー：全員2枚引く。手札が上限に達しているときは、それ以上引けない。</li>
+        <li>素材ドラフト：スタートプレイヤーから順に1人1個ずつ取り、3周する。1個目は好きな皿、2個目と3個目は今の皿か隣の皿から取る。</li>
+        <li>ターンフェーズ：スタートプレイヤーから順に、1人ずつ自分のターンを行う。</li>
+        <li>ラウンド終了：スタートプレイヤーを左隣に移す。12ラウンド目なら勝敗を判定する。</li></ol>
+      <svg class="rb-fig" viewBox="0 0 300 280" role="img" aria-label="五行の皿の並び。隣の皿へだけ動ける">
+        <g stroke="var(--line)" stroke-width="2" stroke-dasharray="4 4"><line x1="150" y1="48" x2="209" y2="230"/><line x1="150" y1="48" x2="91" y2="230"/><line x1="246" y1="118" x2="91" y2="230"/><line x1="246" y1="118" x2="54" y2="118"/><line x1="209" y1="230" x2="54" y2="118"/></g>
+        <g stroke="var(--muted)" stroke-width="2"><line x1="180" y1="70" x2="216" y2="96"/><line x1="235" y1="152" x2="221" y2="196"/><line x1="174" y1="230" x2="126" y2="230"/><line x1="80" y1="196" x2="65" y2="152"/><line x1="84" y1="96" x2="120" y2="70"/></g>
+        <g font-size="17" font-weight="700" text-anchor="middle" style="font-family:var(--display)">
+          <circle cx="150" cy="48" r="28" fill="var(--panel)" stroke="var(--wood)" stroke-width="2.5"/><text x="150" y="54" fill="var(--wood)">木</text>
+          <circle cx="246" cy="118" r="28" fill="var(--panel)" stroke="var(--fire)" stroke-width="2.5"/><text x="246" y="124" fill="var(--fire)">火</text>
+          <circle cx="209" cy="230" r="28" fill="var(--panel)" stroke="var(--earth)" stroke-width="2.5"/><text x="209" y="236" fill="var(--earth)">土</text>
+          <circle cx="91" cy="230" r="28" fill="var(--panel)" stroke="var(--metal)" stroke-width="2.5"/><text x="91" y="236" fill="var(--metal)">金</text>
+          <circle cx="54" cy="118" r="28" fill="var(--panel)" stroke="var(--water)" stroke-width="2.5"/><text x="54" y="124" fill="var(--water)">水</text></g>
+      </svg>
+      <p>実線でつながる隣の皿（相生）へは動けますが、点線の先のひとつ飛ばしの皿（相剋）へは動けません。同じ皿に留まって取るのは自由です。</p>
+      <p>山札が尽きたら、捨て札をシャッフルして新しい山札にします。</p></section>
+    <section id="rb-turn"><h3>ターンでできること</h3>
+      <p>自分のターンでは、次の行動を好きな順番で、条件が許すかぎり何度でも行えます。</p>
+      <p>行動はすべて、手札からネームドゴーレムを作ることと、工房のゴーレムの効果を使うことです。最初から工房にいる3枚が基本の行動になります。</p>
+      <div class="rb-tbl"><table><thead><tr><th>行動</th><th>内容</th></tr></thead><tbody>
+        <tr><td>ネームドゴーレムを作る</td><td>手札のカードのコストを素材で払い、工房に置く。足りない素材は工房の変換ゴーレムで自動的に補う</td></tr>
+        <tr><td>解体ゴーレム（初期）</td><td>手札2枚を捨てて、捨てたどちらかの属性の素材1を得る。無色のカードは好きな属性として扱う</td></tr>
+        <tr><td>廃材ゴーレム（初期）</td><td>好きな素材1を捨てる。上限で詰まったときの逃げ道</td></tr>
+        <tr><td>試作工房（初期）</td><td>好きな素材4を払い、量産ゴーレム+1</td></tr>
+        <tr><td>ループ宣言</td><td>量産が止まらない工房なら自動で証明する。横向きの起こし直しなどを使うループは、宣言後に一周回して「一周完了」を押す</td></tr>
+      </tbody></table></div>
+      <p>工房のカードは「起動」ボタンで使います。手札を捨てる、好きな素材を払うなどのコストは、起動したあとに選びます。選ぶ途中で「キャンセル」を押せば、何も起きずに元に戻ります。</p></section>
+    <section id="rb-named"><h3>ネームドゴーレムの基本ルール</h3>
+      <ul><li>属性はコストの属性で決まる。コストの「無」はどの素材で払ってもよく、無だけのカードは無色。効果は特に書かれていないかぎり何度でも発動する。</li>
+        <li>同名のネームドゴーレムは、工房に1枚までしか置けない。</li>
+        <li>【横向き】の効果は、カードが縦向きのときだけ使える。使ったら横向きにし、自分のターン終了時に縦向きに戻す。</li>
+        <li>ネームドゴーレムの効果で得る素材は皿から減らさず、共通の置き場から得る。皿が減るのは素材ドラフトで取ったときだけ。</li>
+        <li>効果で素材を得るときは、受け取らないことも選べる。画面では、ラウンド開始からドラフト終了までに、受け取ると残りのドラフトで溢れそうなときだけ確認が出る。</li>
+        <li>単体で素材が増える変換はない。素材の増加は、必ず複数のカードの組み合わせから生まれる。</li></ul>
+      <div class="rb-tbl"><table><thead><tr><th>役割</th><th>主な効果</th><th>代表例</th></tr></thead><tbody>
+        <tr><td>変換</td><td>相生の順に1対1で変える</td><td>火口ゴーレム：木1→火1</td></tr>
+        <tr><td>変換（相剋）</td><td>ひとつ飛ばしの属性へ2対1で変える</td><td>根張りゴーレム：木2→土1</td></tr>
+        <tr><td>生産</td><td>素材2個で量産ゴーレム+1</td><td>陶工ゴーレム：土2</td></tr>
+        <tr><td>生産（混成）</td><td>隣り合う2属性と好きな素材1で量産ゴーレム+1</td><td>窯元ゴーレム：火1、土1、好きな1</td></tr>
+        <tr><td>増加誘発</td><td>量産ゴーレムが増えるたび素材1を得る</td><td>番人ゴーレム：土1</td></tr>
+        <tr><td>獲得誘発</td><td>特定の素材を得るたび、相生の次の素材1を得る</td><td>慈雨ゴーレム：水→木</td></tr>
+        <tr><td>取得誘発</td><td>ドラフトで取ったとき、同じ素材をもう1個得る</td><td>苗木ゴーレム、大樹ゴーレム</td></tr>
+        <tr><td>ドロー・素材燃焼</td><td>追加のドロー。素材を支払ってドローする</td><td>設計士ゴーレム、墨池ゴーレム</td></tr>
+        <tr><td>強化</td><td>素材所持上限や手札上限を上げる</td><td>倉庫ゴーレム：素材所持上限+2</td></tr>
+        <tr><td>共有</td><td>全員に配りつつ、自分はより多く得る</td><td>恵みの雨ゴーレム：全員水1、自分は水3</td></tr>
+        <tr><td>軽量</td><td>コスト1〜2の序盤向けカード</td><td>物見ゴーレム、収穫ゴーレム</td></tr>
+        <tr><td>解体（上位）</td><td>解体ゴーレムの強化版</td><td>図面焼却炉、万能炉ゴーレム</td></tr>
+        <tr><td>長</td><td>同じ属性のネームドゴーレム2枚につき素材1</td><td>森の長ゴーレム</td></tr>
+        <tr><td>再利用・起こし</td><td>工房のゴーレムを素材に戻す、横向きを縦向きに戻す</td><td>鋳潰しゴーレム、鶏鳴ゴーレム、暁鐘ゴーレム</td></tr>
+      </tbody></table></div>
+      <p>ループの基本形は、生産1枚、増加誘発2枚、属性のズレを埋める変換0〜3枚の組み合わせです。</p></section>
+    <section id="rb-win"><h3>勝利条件</h3>
+      <h4>ループ完成</h4>
+      <p>生産から始まる処理を一周回したあと、工房が開始時と同じで、素材が開始時以上に残り、量産ゴーレムが増えていれば、何度でも回せることの証明になります。「100億回繰り返します」と宣言し、量産ゴーレム100億体で即勝利です。</p>
+      <h4>12ラウンド終了時</h4>
+      <p>量産ゴーレムが最も多いプレイヤーの勝ちです。同数なら素材の合計、それも同数なら工房のネームドゴーレムの数で比べ、それでも並べば勝利を分け合います。</p>
+      <h4>ソロ</h4>
+      <p>ラウンドの上限はありません。ループを完成させるまでのラウンド数が記録になり、少ないほど高評価です。</p></section>
+    <section id="rb-terms"><h3>用語</h3>
+      <div class="rb-tbl"><table><thead><tr><th>用語</th><th>意味</th></tr></thead><tbody>
+        <tr><td>ネームドゴーレム</td><td>手札から素材を払って工房に置くカード</td></tr>
+        <tr><td>量産ゴーレム</td><td>生産効果で作られるゴーレム。カウンターで数える</td></tr>
+        <tr><td>工房</td><td>作ったネームドゴーレムを並べる自分の場所</td></tr>
+        <tr><td>素材</td><td>木・火・土・金・水の5種類</td></tr>
+        <tr><td>相生</td><td>木→火→土→金→水→木の順。隣り合う皿の関係</td></tr>
+        <tr><td>相剋</td><td>ひとつ飛ばしの関係。ドラフトでは動けない</td></tr>
+        <tr><td>ドラフトで取る</td><td>素材ドラフトで皿から1個取ること。取得誘発はこれにだけ反応する</td></tr>
+        <tr><td>得る</td><td>ドラフト、ボーナス、変換、効果など、あらゆる入手。獲得誘発はこちらに反応する</td></tr>
+      </tbody></table></div></section>
+  </div>
+</aside>
+<script>
+'use strict';
+const E=['木','火','土','金','水'];
+const EK={木:'wood',火:'fire',土:'earth',金:'metal',水:'water'};
+const nx=e=>E[(E.indexOf(e)+1)%5], pv=e=>E[(E.indexOf(e)+4)%5];
+const tot=r=>E.reduce((a,e)=>a+(r[e]||0),0);
+const zero=()=>({木:0,火:0,土:0,金:0,水:0});
+const INF={inf:true};
+function parse(s){const o={};for(const m of s.matchAll(/(\D)(\d+)/g)){const k=m[1]==='無'?'any':m[1];o[k]=(o[k]||0)+(+m[2]);}return o;}
+const DEFS=[];
+function d(name,cost,k,o,n,role,text){DEFS.push(Object.assign({name,cost:parse(cost),k,n,role,text},o));}
+// ---- カードプール（値下げ後コスト） ----
+d('火口ゴーレム','火2','conv',{f:'木',t:'火'},4,'変換','木1→火1');
+d('灰掻きゴーレム','土2','conv',{f:'火',t:'土'},4,'変換','火1→土1');
+d('鉱脈ゴーレム','金2','conv',{f:'土',t:'金'},4,'変換','土1→金1');
+d('結露ゴーレム','水2','conv',{f:'金',t:'水'},4,'変換','金1→水1');
+d('水車ゴーレム','木2','conv',{f:'水',t:'木'},4,'変換','水1→木1');
+[['樹人工房','木'],['炎像工房','火'],['陶工ゴーレム','土'],['鋳造ゴーレム','金'],['氷像工房','水']].forEach(([n,e])=>d(n,e+'2','prod',{pay:{[e]:2}},3,'生産',`${e}2を払い、量産ゴーレム+1`));
+[['苗木','木'],['種火','火'],['粘土','土'],['砂鉄','金'],['湧水','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','pick_lo',{e},3,'取得誘発',`【横向き】ドラフトで${e}を取ったとき、さらに${e}1を得る`));
+[['芽吹き','木'],['炉心','火'],['番人','土'],['鉄鳴り','金'],['産声','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'6','inc',{e},3,'増加誘発',`量産ゴーレムが増えるたび、${e}1を得る`));
+[['焚火工房','木'],['窯元ゴーレム','火'],['鍛造ゴーレム','土'],['錬水ゴーレム','金'],['苔むし工房','水']].forEach(([n,e])=>d(n,e+'3','prod',{pay:{[e]:1,[nx(e)]:1,any:1}},2,'生産(混成)',`${e}1と${nx(e)}1と好きな素材1を払い、量産ゴーレム+1`));
+[['根張り','木'],['溶鉱','火'],['堤','土'],['伐採','金'],['沸騰','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','conv2',{f:e,t:nx(nx(e))},2,'変換(相剋)',`${e}2→${nx(nx(e))}1`));
+d('設計士ゴーレム','木2','draw_round',{},3,'ドロー','ラウンド開始時、追加で1枚ドロー');
+d('図面焼却炉','火4','dis_draw',{},2,'解体(上位)','手札2枚を捨てて、捨てたどちらかの属性の素材1を得て、1枚ドロー（何度でも）');
+d('写本ゴーレム','水5','copy',{},2,'ドロー','水を得るたび、1枚ドロー');
+d('号令ゴーレム','金4','order',{},2,'ドロー','量産ゴーレムが増えるたび、1枚ドロー');
+[['木簡','木'],['灯火','火'],['粘土板','土'],['銘板','金'],['墨池','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','rburn',{e},2,'素材燃焼',`${e}1を支払って、1枚ドロー（何度でも）`));
+d('写字生ゴーレム','金2水2','rburn_any',{},2,'素材燃焼','好きな素材2を支払って、1枚ドロー（何度でも）');
+d('廃棄炉ゴーレム','土3','reset',{},2,'手札リセット','【横向き】手札をすべて捨て、同じ枚数ドロー');
+d('倉庫ゴーレム','土2','cap',{v:2},3,'強化','素材所持上限+2');
+d('大蔵ゴーレム','金5','cap',{v:4},2,'強化','素材所持上限+4');
+d('書庫ゴーレム','水2','hcap',{v:2},2,'強化','手札上限+2');
+d('祝福ゴーレム','水4','bless',{},2,'作成誘発','ネームドゴーレムを作ったとき、好きな素材1を得る');
+d('見習い鍛冶','火2','appr',{},2,'作成誘発','ネームドゴーレムを作ったとき、その属性の素材1を得る');
+d('伝令ゴーレム','水3','herald',{},2,'共有','ラウンド開始時、全員1枚ドロー。自分はさらに1枚');
+d('市場ゴーレム','金3','market',{},2,'共有','補充で各皿が1個多くなる。自分は補充直後に好きな素材1を得る');
+d('恵みの雨ゴーレム','水4','rain',{},2,'共有','作ったとき、全員水1を得る。自分は水3を得る');
+d('豊穣祭ゴーレム','木4','harvest',{},2,'共有','作ったとき、全員好きな素材1。自分は好きな素材2と1枚ドロー');
+d('篝火ゴーレム','火3','bonfire',{},2,'共有','作ったとき、全員1枚ドロー。自分は3枚ドロー');
+[['大樹','木'],['溶岩','火'],['岩盤','土'],['金脈','金'],['大海','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'6','pick_full',{e},1,'取得誘発(完全)',`ドラフトで${e}を取ったとき、さらに${e}1を得る（回数制限なし）`));
+[['燎原','火','木'],['熾火','土','火'],['鉱床','金','土'],['清流','水','金'],['慈雨','木','水']].forEach(([n,g,on])=>d(n+'ゴーレム',g+'5','gt',{on,give:g},1,'獲得誘発',`${on}を得るたび、${g}1を得る`));
+d('万能炉ゴーレム','金2水2','dis_any',{},1,'解体(上位)','手札2枚を捨てて、好きな素材1を得る（何度でも）');
+d('渾沌工房','土2水2','prod',{pay:{any:3}},1,'生産','好きな素材3を払い、量産ゴーレム+1');
+d('双子ゴーレム','木3火3','twin',{},1,'増加誘発','量産ゴーレムが増えるたび、木1か火1を得る');
+d('師範ゴーレム','土4','mentor',{},1,'共有','作ったとき、全員の素材所持上限+1。自分はさらに+2');
+d('互助ゴーレム','土5','mutual',{},1,'共有','他人がネームドゴーレムを作るたび、その人は1枚ドロー。自分は好きな素材1');
+d('灯台ゴーレム','木3','beacon',{},1,'共有','ラウンド開始時、全員好きな素材1。自分はさらに1');
+// 軽量カード
+d('若芽ゴーレム','木1','sprout',{},2,'軽量','ラウンド開始時、手札が4枚以下なら追加で1枚ドロー');
+d('火花ゴーレム','火1','loot',{},2,'軽量','【横向き】手札1枚を捨てて1枚ドロー');
+d('土塊ゴーレム','土1','clod',{},2,'軽量','素材所持上限+1。作ったとき土1を得る');
+d('鉄片ゴーレム','金1','dig',{},2,'軽量','作ったとき、山札の上3枚から1枚を手札に加え、残りは捨て札に');
+d('水滴ゴーレム','水1','dew',{},2,'軽量','【横向き】素材1を、相生の次の素材に変える');
+d('物見ゴーレム','無1','scout',{},2,'軽量','手札上限+1。作ったとき1枚ドロー');
+d('運び屋ゴーレム','無2','porter',{},2,'軽量','素材所持上限+1。作ったとき1枚ドロー');
+d('種まきゴーレム','無2','seeder',{},2,'軽量','【横向き】木1を得る');
+d('収穫ゴーレム','木1無1','reaper',{},2,'軽量','【横向き】好きな素材1を得る');
+d('小窯ゴーレム','土1無1','prod',{pay:{土:1,any:2}},2,'軽量','土1と好きな素材2を払い、量産ゴーレム+1');
+d('継ぎ手ゴーレム','金1無1','joint',{},2,'軽量','【横向き】素材1を好きな素材1と入れ替える');
+d('鋳潰しゴーレム','火2','melt',{},2,'再利用','自分の工房のネームドゴーレム1枚を捨て札にして、その属性の素材1を得る（何度でも・初期カードは対象外）');
+[['森','木'],['焔','火'],['岳','土'],['鉱','金'],['淵','水']].forEach(([n,e])=>d(n+'の長ゴーレム',e+'3','chief',{e},2,'長',`【横向き】自分の工房の${e}のネームドゴーレム2枚につき、${e}1を得る`));
+d('鶏鳴ゴーレム','火1水1無1','rooster',{},2,'起こし','【横向き】手札1枚を捨てて、工房の別のネームドゴーレム1枚を縦向きに戻す');
+d('暁鐘ゴーレム','木2火1土1金1水1','bell',{},1,'起こし','手札2枚を捨てて、工房の別のネームドゴーレム1枚を縦向きに戻す（何度でも）');
+DEFS.forEach(x=>{x.els=Object.keys(x.cost).filter(k=>k!=='any');x.text=x.text.replace(/を得る(?!たび)/g,'を得ることができる');});
+const STARTERS=[
+  {name:'解体ゴーレム',cost:{},k:'dismantle',role:'初期',text:'手札2枚を捨てて、捨てたどちらかの属性の素材1を得る（何度でも）'},
+  {name:'廃材ゴーレム',cost:{},k:'scrap',role:'初期',text:'好きな素材1を捨てる（何度でも）'},
+  {name:'試作工房',cost:{},k:'prod',pay:{any:4},role:'初期',text:'好きな素材4を払い、量産ゴーレム+1'}];
+STARTERS.forEach(x=>{x.els=[];x.starter=true;x.text=x.text.replace(/を得る(?!たび)/g,'を得ることができる');});
+const cardEls=c=>c.els.length?c.els:E;
+
+// ---- 状態 ----
+let G=null, UID=0;
+const NAMES=['あなた','CPU 赤銅','CPU 紫雲','CPU 琥珀','CPU 藍'];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function newGame(nCpu,opt={}){
+  const hum=opt.humans||null;
+  const allCpu=!!opt.allCpu, n=allCpu?nCpu:(hum?hum.length:1)+nCpu;
+  const deck=[];DEFS.forEach(df=>{for(let i=0;i<df.n;i++)deck.push(Object.assign({},df,{uid:++UID,tapped:false}));});
+  shuffle(deck);
+  const players=[];for(let i=0;i<n;i++){const res=zero();E.forEach(e=>res[e]=1);
+    const nh=hum?hum.length:1;players.push({i,name:allCpu?`CPU${i+1}`:hum?(i<nh?hum[i]:NAMES[i-nh+1]):NAMES[i],cpu:allCpu||i>=nh,res,cap:10,hcap:7,hand:[],tab:STARTERS.map(s=>Object.assign({},s,{uid:++UID,tapped:false})),golems:0,pos:null});}
+  G={token:{},n,solo:n===1,players,deck,disc:[],dish:zero(),round:0,phase:'setup',start:0,cur:null,lap:0,log:[],sel:new Set(),modal:null,busy:false,over:null,chain:0,overflowP:null,allowed:[],fast:!!opt.fast,warn:'',proof:null,window:false,picks:{},fxq:[],fxBuilt:{},fxPrev:null,fxHop:[],gPend:{},online:!!hum,warnI:null};
+  players.forEach(p=>draw(p,5));
+  run();
+}
+let RB_OPEN=false;
+let SOUND=true;try{SOUND=localStorage.getItem('golem-sound')!=='off';}catch(e){}
+let AC=null;
+let NET=null; // オンライン対戦の接続状態
+function sfx(type){
+  if(!SOUND||typeof window==='undefined')return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();}catch(e){return;}
+  const t0=AC.currentTime;
+  const tone=(f,dt,dur,wave='triangle',vol=.12,f2)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=wave;o.frequency.setValueAtTime(f,t0+dt);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t0+dt+dur);
+    g.gain.setValueAtTime(0.0001,t0+dt);g.gain.exponentialRampToValueAtTime(vol,t0+dt+.008);g.gain.exponentialRampToValueAtTime(0.0001,t0+dt+dur);o.connect(g).connect(AC.destination);o.start(t0+dt);o.stop(t0+dt+dur+.02);};
+  if(type==='tap')tone(880,0,.05,'sine',.06);
+  if(type==='sel')tone(660,0,.06,'triangle',.07);
+  if(type==='pick'){tone(420,0,.09,'triangle',.14,300);tone(1200,0,.03,'square',.03);}
+  if(type==='build'){tone(392,0,.1,'triangle',.12);tone(523,.07,.14,'triangle',.12);}
+  if(type==='golem'){tone(784,0,.12,'sine',.1);tone(1175,.06,.2,'sine',.08);}
+  if(type==='deny')tone(160,0,.12,'sawtooth',.05,120);
+  if(type==='win')[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.32,'triangle',.12));
+}
+const sleep=ms=>(G&&G.fast)?Promise.resolve():new Promise(r=>{const go=()=>{if(RB_OPEN&&!NET)setTimeout(go,200);else setTimeout(r,ms);};go();});
+function log(t,cls=''){G.log.unshift({t,cls});if(G.log.length>160)G.log.pop();}
+function order(){const o=[];for(let k=0;k<G.n;k++)o.push(G.players[(G.start+k)%G.n]);return o;}
+function has(p,k){return p.tab.filter(c=>c.k===k);}
+function deckPop(){if(!G.deck.length){if(!G.disc.length)return null;G.deck=shuffle(G.disc);G.disc=[];log('山札が尽きたので、捨て札をシャッフルして山札にした');}return G.deck.pop();}
+function draw(p,k){for(let i=0;i<k;i++){if(p.hand.length>=p.hcap){if(!p.cpu)log(`手札が上限${p.hcap}枚なので、${k-i}枚は引けなかった`);return;}const c=deckPop();if(!c)return;p.hand.push(c);}}
+// ---- 素材の獲得 ----
+// ラウンド開始〜ドラフト終了の間、効果で得る素材は、空きが残りドラフト回数以下なら保留して確認する
+function picksLeft(p){return G.window?3-(G.picks[p.i]||0):0;}
+function tight(p){return G.window&&p.cap-tot(p.res)<=picksLeft(p);}
+let FXSRC=null;
+const fxOn=()=>typeof document!=='undefined'&&G&&!G.fast;
+function gain(p,e,src='effect'){
+  if(src==='effect'&&tight(p)){(p.pending||(p.pending=[])).push({e,src:FXSRC});return;}
+  gainNow(p,e);
+}
+function gainNow(p,e){
+  G.chain++; if(G.chain>400){G.overflowP=p;return;}
+  if(tot(p.res)<p.cap){p.res[e]++;if(fxOn()&&G.fxq.length<200)G.fxq.push({i:p.i,e,src:FXSRC});}
+  for(const c of p.tab){if(c.k==='gt'&&c.on===e){const sv=FXSRC;FXSRC=c.uid;gain(p,c.give);FXSRC=sv;}if(c.k==='copy'&&e==='水')draw(p,1);}
+}
+async function resolvePending(p){
+  let guard=0;
+  while(p.pending&&p.pending.length&&guard++<50){
+    const pe=p.pending.shift(),e=pe.e;FXSRC=pe.src;
+    if(!tight(p)){G.chain=0;gainNow(p,e);continue;}
+    let ok;
+    if(p.cpu){const dd=desire(p);ok=dd[e]>0&&tot(p.res)<p.cap;}
+    else ok=await chooseOpt(p,`効果で${e}1を得ることができます。受け取ると、このラウンドの残りのドラフト（${picksLeft(p)}回）で素材が溢れるかもしれません（いま ${tot(p.res)}/${p.cap}）`,[{v:true,label:`${e}を受け取る`,el:e},{v:false,label:'断る',el:null}]);
+    if(ok){G.chain=0;gainNow(p,e);}else log(`${p.name}は${e}を受け取らなかった`);
+  }
+  if(p.pending)p.pending.length=0;
+}
+function realSt(p){return {res:p.res,tab:p.tab,get cap(){return p.cap},gain:e=>gain(p,e),p};}
+function simSt(p,res,cap){const st={res:Object.assign(zero(),res||p.res),tab:p.tab,cap:cap==null?p.cap:cap,ev:0};
+  st.gain=e=>{st.ev++;if(st.ev>3000)throw INF;if(tot(st.res)<st.cap)st.res[e]++;for(const c of st.tab)if(c.k==='gt'&&c.on===e)st.gain(c.give);};return st;}
+// ---- 変換経路と支払い ----
+function edges(tab){const ed=[];for(const c of tab){if(c.k==='conv')ed.push([c.f,c.t,1,c]);if(c.k==='conv2')ed.push([c.f,c.t,2,c]);}return ed;}
+function pathTo(tab,t,r,need){
+  const ed=edges(tab);let best=null;let fr=[[t,1,[]]];
+  for(let dp=0;dp<4;dp++){const nf=[];
+    for(const [cur,mult,path] of fr){for(const [a,b,k,c] of ed){
+      if(b!==cur||a===t||path.some(x=>x[0]===a))continue;
+      const np=[[a,b,k,c],...path],m=mult*k;
+      if(r[a]-(need[a]||0)>=m&&(!best||m<best.m))best={src:a,m,path:np};
+      nf.push([a,m,np]);}}
+    fr=nf;}
+  return best;
+}
+function splitCost(cost){const need={};let any=0;for(const k in cost){if(k==='any')any=cost[k];else need[k]=cost[k];}return [need,any];}
+function canPay(tab,res,cost){
+  const r=Object.assign(zero(),res);const [need,any]=splitCost(cost);
+  for(const t in need){let g=0;while(r[t]<need[t]){if(++g>40)return false;const b=pathTo(tab,t,r,need);if(!b)return false;r[b.src]-=b.m;r[t]++;}}
+  return tot(r)-tot(need)>=any;
+}
+function pay(st,cost){
+  const [need,any]=splitCost(cost);
+  for(const t in need){let g=0;while(st.res[t]<need[t]){if(++g>40)return false;const b=pathTo(st.tab,t,st.res,need);if(!b)return false;
+    let amt=b.m;for(const [a,bb,k,cc] of b.path){st.res[a]-=amt;const outs=amt/k;const sv=FXSRC;FXSRC=cc.uid;for(let i=0;i<outs;i++)st.gain(bb);FXSRC=sv;amt=outs;}}}
+  for(const t in need)st.res[t]-=need[t];
+  for(let i=0;i<any;i++){const e=E.filter(x=>st.res[x]>0).sort((a,b)=>st.res[b]-st.res[a])[0];if(!e)return false;st.res[e]--;}
+  return true;
+}
+function twinPick(res,tab){const prods=tab.filter(c=>c.k==='prod');for(const pr of prods){for(const e of ['木','火'])if(pr.pay[e]&&res[e]<pr.pay[e])return e;}return res['木']<=res['火']?'木':'火';}
+function fireInc(st,times=1){const sv=FXSRC;for(let t=0;t<times;t++)for(const c of st.tab){FXSRC=c.uid;if(c.k==='inc')st.gain(c.e);if(c.k==='twin')st.gain(twinPick(st.res,st.tab));}FXSRC=sv;}
+function produceSim(st){for(const c of st.tab){if(c.k!=='prod')continue;if(!canPay(st.tab,st.res,c.pay))continue;if(!pay(st,c.pay))continue;fireInc(st);return true;}return false;}
+function loopCheck(p){const st=simSt(p);let g=0;try{while(g<40&&produceSim(st))g++;}catch(x){if(x===INF)return true;throw x;}return g>=40;}
+function isLoopTab(tab){for(const c of tab){if(c.k!=='prod')continue;const [need,any]=splitCost(c.pay);const res=Object.assign(zero(),need);if(any){const k0=Object.keys(need)[0]||'木';res[k0]+=any;}
+  const st=simSt({tab,res},res,99);let g=0;try{while(g<40&&produceSim(st))g++;}catch(x){if(x===INF)return true;throw x;}if(g>=40)return true;}return false;}
+
+// ---- 量産ゴーレムの絵 ----
+const GSTONE=d=>`<path d="${d}" fill="#8e8b87"/><path d="${d}" fill="url(#gSpeck)" stroke="none"/><path d="${d}" fill="url(#gShade)"/>`;
+const G_LEGS_STAND=GSTONE('M548 1292 L670 1284 L692 1468 Q690 1486 668 1488 L578 1490 Q556 1488 552 1470 Z')+GSTONE('M826 1286 L922 1280 Q958 1296 966 1318 L1030 1458 Q1034 1484 1006 1494 L912 1522 Q884 1528 868 1508 L840 1480 Z');
+const G_LEGS_SIT=GSTONE('M572 1200 L690 1222 L668 1330 Q650 1360 610 1366 L520 1352 Q496 1344 504 1318 Z')+GSTONE('M952 1200 L834 1222 L856 1330 Q874 1360 914 1366 L1004 1352 Q1028 1344 1020 1318 Z')+'<path d="M512 1318 L612 1334 L606 1364 L508 1350 Z" fill="#6f6c68"/><path d="M1012 1318 L912 1334 L918 1364 L1016 1350 Z" fill="#6f6c68"/>';
+const G_ARMS=GSTONE('M584 958 L546 926 L470 980 L362 1084 L368 1132 L474 1150 L512 1118 L560 1060 Z')+'<path d="M326 1090 L364 1084 L372 1140 L338 1146 Z" fill="#7d7a76"/><path d="M406 1152 L470 1150 L474 1196 L410 1198 Z" fill="#7d7a76"/>'+GSTONE('M972 958 L1016 948 L1108 1060 L1160 1108 L1122 1166 L1060 1168 L1040 1120 L990 1040 Z')+'<path d="M1140 1096 L1176 1102 L1180 1138 L1150 1146 Z" fill="#7d7a76"/><path d="M1050 1176 L1112 1168 L1118 1200 L1054 1206 Z" fill="#7d7a76"/>';
+const G_BODY=GSTONE('M610 946 Q760 920 932 930 Q968 960 974 1040 Q980 1150 952 1206 Q900 1262 780 1268 Q640 1270 590 1250 Q552 1236 550 1160 Q548 1040 568 984 Q580 958 610 946 Z');
+const G_VEINS='M712 1030 L664 1000 L626 954 M706 1082 L622 1138 L562 1170 M744 1116 L726 1196 L706 1262 M786 1118 L796 1170 L846 1262 M824 1080 L880 1110 L902 1082 L968 1092 M810 1020 L860 972 L920 978 L948 934';
+const G_CORE='<circle cx="765" cy="1062" r="110" fill="url(#gCoreGlow)"/><polygon points="765,998 813.5,1023.3 825.4,1075.8 791.9,1117.9 738.1,1117.9 704.6,1075.8 716.5,1023.3" fill="url(#gCore)" stroke="#141210" stroke-width="12" stroke-linejoin="round"/>';
+const G_HEAD=`<g class="g-head">${GSTONE('M578 916 Q566 840 584 764 Q610 676 704 654 Q800 640 866 690 Q930 748 936 830 Q940 880 930 916 Q760 940 578 916 Z')}<path d="M634 742 L688 738 Q694 790 690 838 L640 842 Q628 790 634 742 Z" fill="#a46cff"/><path d="M768 742 L822 740 Q830 786 826 832 L774 836 Q766 788 768 742 Z" fill="#a46cff"/><rect x="648" y="756" width="14" height="34" rx="6" fill="#f1e4ff" stroke="none"/><rect x="782" y="756" width="14" height="34" rx="6" fill="#f1e4ff" stroke="none"/></g>`;
+function golemSVG(pose){
+  if(pose==='sit')return golemSitSVG();
+  const sit=false;
+  return `<svg class="golem-art ${sit?'sit':'stand'}" viewBox="${sit?'300 630 920 760':'300 630 920 920'}" aria-hidden="true"><g stroke="#141210" stroke-width="12" stroke-linejoin="round">${sit?G_LEGS_SIT:G_LEGS_STAND}${G_ARMS}${G_BODY}</g><path d="${G_VEINS}" fill="none" stroke="#0c0a09" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><path d="${G_VEINS}" fill="none" stroke="#b98aff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>${G_CORE}<g stroke="#141210" stroke-width="12" stroke-linejoin="round">${G_HEAD}</g></svg>`;
+}
+
+// 座り姿（斜め45度、脚を前に投げ出す）
+const SST=(d,base='#8e8b87')=>`<path d="${d}" fill="${base}"/><path d="${d}" fill="url(#gSpeckS)" stroke="none"/><path d="${d}" fill="url(#gShade)"/>`;
+function golemSitSVG(){
+  const BV='M156 146 L130 128 L112 104 M156 172 L120 196 L100 212 M176 182 L170 216 L162 246 M192 160 L214 176 L226 170 M188 140 L208 118 L222 108';
+  const vein=d=>`<path d="${d}" fill="none" stroke="#0c0a09" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#b98aff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<svg class="golem-art sit" viewBox="20 -14 330 330" aria-hidden="true">
+<ellipse cx="195" cy="290" rx="150" ry="14" fill="#000" opacity=".45"/>
+<g transform="rotate(-11 165 242)"><g stroke="#141210" stroke-width="5.5" stroke-linejoin="round">
+${SST('M200 108 L232 104 L262 176 L258 210 L226 214 L210 170 Z','#7f7c78')}<path d="M226 208 L268 206 L272 226 L230 230 Z" fill="#6f6c68"/>
+</g></g>
+<g stroke="#141210" stroke-width="5.5" stroke-linejoin="round">
+${SST('M170 204 L262 194 Q290 192 294 216 L296 236 Q290 252 268 250 L176 254 Z','#7f7c78')}<path d="M278 194 Q306 200 304 226 Q302 252 278 252 Q292 222 278 194 Z" fill="#5f5c58"/>
+<g transform="rotate(7 155 254)">${SST('M150 226 L256 232 Q288 234 290 260 Q286 286 258 286 L156 280 Z')}<path d="M270 230 Q302 238 300 262 Q296 290 266 288 Q284 260 270 230 Z" fill="#66635f"/></g>
+</g>
+<g transform="rotate(-11 165 242)">
+<g stroke="#141210" stroke-width="5.5" stroke-linejoin="round">
+${SST('M100 98 Q160 84 210 100 Q232 130 228 190 Q222 240 170 248 Q118 250 98 226 Q84 170 100 98 Z')}
+</g>
+${vein(BV)}
+<circle cx="174" cy="160" r="44" fill="url(#gCoreGlow)"/>
+<polygon points="174,138 191,147 195,166 183,180 165,180 154,166 158,147" fill="url(#gCore)" stroke="#141210" stroke-width="5" stroke-linejoin="round"/>
+<g stroke="#141210" stroke-width="5.5" stroke-linejoin="round">
+${SST('M140 120 L112 112 L70 184 L58 220 L96 226 L128 190 Z')}<path d="M44 214 L82 210 L88 232 L48 238 Z" fill="#7d7a76"/>
+<g transform="rotate(17 172 96)"><g class="g-head">${SST('M110 92 Q104 50 128 24 Q156 4 196 10 Q232 22 238 56 Q240 80 234 94 Q170 104 110 92 Z','#96938f')}
+<path d="M166 30 L188 29 Q191 48 189 66 L169 67 Q164 48 166 30 Z" fill="#a46cff"/>
+<path d="M208 30 L224 30 Q228 47 226 64 L210 65 Q206 47 208 30 Z" fill="#a46cff"/>
+<rect x="172" y="35" width="5.5" height="14" rx="2.5" fill="#f1e4ff" stroke="none"/><rect x="212" y="35" width="5" height="13" rx="2.5" fill="#f1e4ff" stroke="none"/></g></g>
+</g>
+</g></svg>`;
+}
+// 後ろ姿（顔とコアなし、背中に鉱脈だけ）
+const G_BACK_VEINS='M765 948 L756 1008 L774 1070 L758 1142 L770 1222 M756 1008 L700 984 L632 996 M774 1070 L842 1048 L912 1066 M758 1142 L688 1172 L606 1188 M770 1222 L836 1200 L922 1214';
+function golemBackSVG(){
+  return `<svg class="golem-art back" viewBox="300 630 920 920" aria-hidden="true"><g transform="translate(1520 0) scale(-1 1)"><g stroke="#141210" stroke-width="12" stroke-linejoin="round">${G_LEGS_STAND}${G_ARMS}${G_BODY}</g></g><path d="${G_BACK_VEINS}" fill="none" stroke="#0c0a09" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><path d="${G_BACK_VEINS}" fill="none" stroke="#b98aff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><g stroke="#141210" stroke-width="12" stroke-linejoin="round">${GSTONE('M578 916 Q566 840 584 764 Q610 676 704 654 Q800 640 866 690 Q930 748 936 830 Q940 880 930 916 Q760 940 578 916 Z')}</g><path d="M600 900 Q760 918 918 898" fill="none" stroke="#141210" stroke-width="10" stroke-linecap="round" opacity=".55"/></svg>`;
+}
+function hopGolem(uid,delay,onArrive){
+  const srcEl=document.querySelector(`[data-tip="${uid}"]`);
+  const src=fxPoint(`[data-tip="${uid}"]`);if(!src||!srcEl)return false;
+  // 行き先：CPUの行なら行内の量産数、自分なら工房見出しの座りゴーレム
+  const row=srcEl.closest('[data-pl]');
+  const tgtEl=row?row.querySelector('.golems'):document.querySelector('.count.golem .sitter');
+  let tr=tgtEl&&tgtEl.getBoundingClientRect();if(tr&&!tr.width&&!tr.height)tr=null;
+  const tgt=tr?{x:tr.left+tr.width/2,y:tr.top+tr.height/2}:{x:src.x+(src.x<innerWidth*0.62?140:-140),y:src.y};
+  const vx=tgt.x-src.x,vy=tgt.y-src.y,L=Math.hypot(vx,vy)||1;
+  const back=vy<-40&&Math.abs(vx)<-vy*1.2;      // 上方向なら後ろ姿で歩く
+  const wd=vx>=0?1:-1;                            // 歩く向き（左右）
+  const f0=-wd;                                   // 最初は反対向きに跳ぶ
+  const f1=back?1:wd;
+  const w=46,h=46;
+  const d=document.createElement('div');d.className='fx-golem';
+  d.innerHTML=`<div class="gf">${golemSVG('stand')}</div>${back?`<div class="gb">${golemBackSVG()}</div>`:''}`;
+  d.style.left=(src.x-w/2)+'px';d.style.top=(src.y-h/2)+'px';
+  document.body.appendChild(d);
+  const K=(x,y,r=0,sx=1,sy=1)=>`translate(${x}px,${y}px) rotate(${r}deg) scale(${sx},${sy})`;
+  const lx=8*f0,ux=vx/L,uy=vy/L,trav=Math.max(40,Math.min(L-16,260));
+  const P=t=>[lx+ux*trav*t,uy*trav*t];
+  const sc=t=>back?1-0.22*t:1;
+  const kf=[
+    {transform:K(0,8,0,.4*f0,.4),opacity:0},
+    {transform:K(0,0,0,1.08*f0,.86),opacity:1,offset:.05},
+    {transform:K(4*f0,-38,-4*f0,.94*f0,1.1),offset:.13},
+    {transform:K(lx,0,0,1.14*f0,.82),offset:.21},
+    {transform:K(lx,0,0,.97*f0,1.04),offset:.25},
+    {transform:K(lx,0,0,f0,1),offset:.29},
+    {transform:K(lx,-1,3*f0,f0,1.02),offset:.37},
+    {transform:K(lx,0,0,f0,1),offset:.42},
+    {transform:K(lx,-1,-3*f0,f0,1.02),offset:.48},
+    {transform:K(lx,0,0,f0,1),offset:.53},
+    {transform:K(lx,-6,0,.06*f0,1.05),offset:.565},  // くるっ
+    {transform:K(lx,0,0,f1,1),offset:.6}
+  ];
+  const steps=[.66,.72,.78,.84,.9],rr=back?5:7;
+  steps.forEach((o,k)=>{const t=(k+1)/6,[x,y]=P(t),s=sc(t);kf.push({transform:K(x,y-(k%2?0:5),(k%2?rr:-rr)*f1,s*f1,s),offset:o,opacity:1});});
+  {const [x,y]=P(1),s=sc(1)*.9;kf.push({transform:K(x,y,0,s*f1,s),opacity:0});}
+  const opt={duration:2800,delay,easing:'ease-in-out',fill:'backwards'};
+  const an=d.animate(kf,opt);
+  if(back){
+    const sw={duration:2800,delay,fill:'both'};
+    d.firstChild.animate([{opacity:1},{opacity:1,offset:.565},{opacity:0,offset:.566},{opacity:0}],sw);
+    d.lastChild.animate([{opacity:0},{opacity:0,offset:.565},{opacity:1,offset:.566},{opacity:1}],sw);
+  }
+  an.onfinish=()=>d.remove();an.oncancel=()=>d.remove();
+  if(tr&&L-16<=260&&onArrive){setTimeout(onArrive,delay+2800*.93);return true;}
+  return false;
+}
+// ---- 実プレイの行動 ----
+function produceReal(p,c){
+  const st=realSt(p);if(!canPay(p.tab,p.res,c.pay))return false;
+  if(!pay(st,c.pay))return false;p.golems++;if(fxOn()){G.gPend[p.i]=(G.gPend[p.i]||0)+1;if(G.fxHop.length<6)G.fxHop.push(c.uid);}fireInc(st);for(const _ of has(p,'order'))draw(p,1);return true;
+}
+async function chooseOpt(p,title,opts,cpuPick,cancel){
+  if(!opts.length)return null;
+  if(p.cpu)return cpuPick?cpuPick(opts):opts[0].v;
+  return new Promise(res=>{G.modal={title,opts,res,cancel:!!cancel,owner:p.i};render();});
+}
+// 工房のカードを起動したあとのコスト選択（キャンセル可）
+const elOpts=(p,els,r)=>els.map(e=>({v:e,label:`${e}（所持 ${(r||p.res)[e]}）`,el:e}));
+async function askEl(p,title,els,r){return chooseOpt(p,title,elOpts(p,els,r),null,true);}
+async function askHand(p,title,k,exclude=[]){
+  const picked=[];
+  for(let i=0;i<k;i++){
+    const opts=p.hand.filter(c=>!picked.includes(c)&&!exclude.includes(c)).map(c=>({v:c.uid,label:c.name,el:c.els[0]||null}));
+    if(!opts.length)return null;
+    const v=await chooseOpt(p,`${title}（${i+1}/${k}枚目）`,opts,null,true);
+    if(v==null)return null;picked.push(p.hand.find(c=>c.uid===v));}
+  return picked;
+}
+async function chooseEl(p,title,els){
+  els=els||E;if(!els.length)return null;
+  return chooseOpt(p,title,els.map(e=>({v:e,label:`${e}（所持 ${p.res[e]}）`,el:e})),opts=>{const dd=desire(p);return opts.map(o=>o.v).sort((a,b)=>dd[b]-dd[a]||Math.random()-.5)[0];});
+}
+async function gainAny(p,why,k=1){for(let i=0;i<k;i++){const e=await chooseEl(p,`${why}：好きな素材を1つ選んでください`);if(e){G.chain=0;gain(p,e);}}}
+async function payReal(p,cost,why){
+  if(p.cpu)return pay(realSt(p),cost);
+  const [need,any]=splitCost(cost);
+  const sim=simSt(p);try{if(!pay(sim,need))return false;}catch(x){return false;}
+  const r=Object.assign({},sim.res),picks=[];
+  for(let i=0;i<any;i++){
+    const held=E.filter(x=>r[x]>0);if(!held.length)return false;
+    const e=await askEl(p,`${why}：「好きな素材」で払う分を選んでください（${i+1}/${any}）`,held,r);
+    if(e==null)return false;r[e]--;picks.push(e);}
+  if(!pay(realSt(p),need))return false;
+  for(const e of picks)p.res[e]--;
+  return true;
+}
+async function build(p,c){
+  if(p.tab.some(x=>x.name===c.name))return false;
+  if(!canPay(p.tab,p.res,c.cost))return false;
+  if(!(await payReal(p,c.cost,c.name)))return 'cancel';
+  p.hand.splice(p.hand.indexOf(c),1);p.tab.push(c);c.tapped=false;
+  if(G.fxBuilt)G.fxBuilt[p.i]=c.uid;
+  log(`${p.name}が${c.name}を作った`);
+  await onBuilt(p,c);return true;
+}
+async function onBuilt(p,c){
+  const others=G.players.filter(q=>q!==p);FXSRC=c.uid;
+  if(c.k==='cap')p.cap+=c.v;
+  if(c.k==='hcap')p.hcap+=c.v;
+  if(c.k==='clod'){p.cap+=1;G.chain=0;gain(p,'土');}
+  if(c.k==='porter'){p.cap+=1;draw(p,1);}
+  if(c.k==='scout'){p.hcap+=1;draw(p,1);}
+  if(c.k==='dig'){const look=[];for(let i=0;i<3;i++){const x=deckPop();if(x)look.push(x);}
+    if(look.length){const v=await chooseOpt(p,'鉄片ゴーレム：山札の上3枚から、手札に加える1枚を選んでください（残りは捨て札）',look.map(x=>({v:x.uid,label:x.name,el:x.els[0],card:x})),opts=>{const best=look.slice().sort((a,b)=>value(p,b)-value(p,a))[0];return best.uid;});
+      const pick=look.find(x=>x.uid===v);look.forEach(x=>{if(x===pick&&p.hand.length<p.hcap)p.hand.push(x);else G.disc.push(x);});}}
+  for(const x of p.tab){if(x===c)continue;
+    if(x.k==='bless'){FXSRC=x.uid;await gainAny(p,x.name);}
+    if(x.k==='appr'){FXSRC=x.uid;G.chain=0;gain(p,c.els[0]||'木');}}
+  FXSRC=c.uid;
+  if(c.k==='rain'){others.forEach(q=>{G.chain=0;gain(q,'水');});for(let i=0;i<3;i++){G.chain=0;gain(p,'水');}}
+  if(c.k==='harvest'){for(const q of others)await gainAny(q,`${p.name}の豊穣祭`);await gainAny(p,'豊穣祭',2);draw(p,1);}
+  if(c.k==='bonfire'){others.forEach(q=>draw(q,1));draw(p,3);}
+  if(c.k==='mentor'){others.forEach(q=>q.cap+=1);p.cap+=3;}
+  for(const q of others)for(const m of has(q,'mutual')){FXSRC=m.uid;draw(p,1);await gainAny(q,`${p.name}の建設に互助`);}
+  FXSRC=null;
+}
+async function dismantle(p,cards,mode){
+  const els=[...new Set(cards.flatMap(c=>cardEls(c)))];
+  cards.forEach(c=>{p.hand.splice(p.hand.indexOf(c),1);G.disc.push(c);});
+  const opts=mode==='any'?E:els;
+  const dc=p.tab.find(x=>x.k===(mode==='any'?'dis_any':mode==='draw'?'dis_draw':'dismantle'));FXSRC=dc?dc.uid:null;
+  const e=opts.length===1?opts[0]:await chooseEl(p,'解体：得る素材を選んでください',opts);
+  G.chain=0;gain(p,e);log(`${p.name}が手札2枚を解体して${e}を得た${mode==='draw'?'（さらに1枚ドロー）':''}`);
+  if(mode==='draw')draw(p,1);
+}
+function fxPoint(sel){const el=document.querySelector(sel);if(!el)return null;const r=el.getBoundingClientRect();if(!r.width&&!r.height)return null;return {x:r.left+r.width/2,y:r.top+r.height/2};}
+function fxDot(e,from,to,delay,kind){
+  const d=document.createElement('div');d.className='fx-dot';d.style.background=`var(--${EK[e]})`;d.style.color=`var(--${EK[e]})`;d.style.left=(from.x-9)+'px';d.style.top=(from.y-9)+'px';
+  document.body.appendChild(d);
+  let frames;
+  if(kind==='vanish')frames=[{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate(0,-34px) scale(.7)',opacity:0}];
+  else{const dx=to.x-from.x,dy=to.y-from.y;frames=[{transform:'translate(0,0) scale(1.15)'},{transform:`translate(${dx/2}px,${Math.min(0,dy)/2-40}px) scale(1)`,offset:.45},{transform:`translate(${dx}px,${dy}px) scale(.55)`,opacity:.9}];}
+  const an=d.animate(frames,{duration:kind==='vanish'?420:540,delay,easing:'cubic-bezier(.35,.1,.25,1)',fill:'backwards'});
+  an.onfinish=()=>d.remove();an.oncancel=()=>d.remove();
+}
+function playFx(){
+  if(!fxOn())return;
+  const q=G.fxq;G.fxq=[];const built=G.fxBuilt;G.fxBuilt={};const hops=G.fxHop||[];G.fxHop=[];
+  if(NET&&NET.role==='host'){const a=NET.fxAcc||(NET.fxAcc={q:[],hop:[],built:{}});a.q.push(...q.slice(0,40));if(a.q.length>200)a.q.length=200;a.hop.push(...hops);Object.assign(a.built,built);netPush();}
+  const prev=G.fxPrev||{};G.fxPrev={};G.players.forEach(p=>G.fxPrev[p.i]=Object.assign({},p.res));
+  const owner=uid=>G.players.find(q=>q.tab.some(c=>c.uid===uid));
+  const flush=i=>{G.gPend[i]=0;syncGolemCount(i,false);};
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){Object.keys(G.gPend).forEach(flush);return;}
+  const plan={};
+  hops.slice(0,3).forEach(uid=>{const o=owner(uid);if(o)(plan[o.i]=plan[o.i]||[]).push(uid);});
+  let k=0;G.gWalk=G.gWalk||{};
+  for(const i in plan)plan[i].forEach(uid=>{
+    if(hopGolem(uid,(k++)*260,()=>{G.gWalk[i]=Math.max(0,(G.gWalk[i]||0)-1);if(G.over)return;
+      G.gPend[i]=G.gWalk[i]?Math.max(0,(G.gPend[i]||0)-1):0;syncGolemCount(+i,true);}))G.gWalk[i]=(G.gWalk[i]||0)+1;});
+  // 歩いている子がいない分は、すぐ反映
+  Object.keys(G.gPend).forEach(i=>{if(G.gPend[i]&&!G.gWalk[i])flush(i);});
+  const jobs=[];
+  for(const p of G.players){const pr=prev[p.i];if(!pr)continue;
+    for(const e of E){const gained=q.filter(x=>x.i===p.i&&x.e===e).length;const spent=gained-(p.res[e]-pr[e]);
+      for(let k=0;k<Math.min(spent,4);k++)jobs.push({kind:built[p.i]!=null?'build':'vanish',p,e,to:built[p.i]});}}
+  for(const g of q)jobs.push({kind:'gain',p:G.players[g.i],e:g.e,src:g.src});
+  let delay=0;
+  for(const j of jobs.slice(0,16)){
+    const chip=`[data-pl="${j.p.i}"] [data-res="${j.e}"]`;
+    if(j.kind==='vanish'){const a=fxPoint(chip);if(a)fxDot(j.e,a,null,delay,'vanish');}
+    else if(j.kind==='build'){const a=fxPoint(chip),b=fxPoint(`[data-tip="${j.to}"]`);if(a&&b)fxDot(j.e,a,b,delay,'fly');}
+    else{const b=fxPoint(chip);if(!b)continue;
+      const a=typeof j.src==='string'&&j.src.startsWith('dish:')?fxPoint(`[data-dish="${j.src.slice(5)}"] circle.base`):j.src!=null?fxPoint(`[data-tip="${j.src}"]`):null;
+      fxDot(j.e,a||{x:b.x,y:b.y-40},b,delay,'fly');}
+    delay+=70;}
+}
+async function take(p,e){
+  G.chain=0;G.dish[e]--;p.pos=e;G.picks[p.i]=(G.picks[p.i]||0)+1;FXSRC='dish:'+e;gain(p,e,'draft');let extra=0;
+  for(const c of p.tab){
+    if(c.k==='pick_lo'&&c.e===e&&!c.tapped){c.tapped=true;G.chain=0;FXSRC=c.uid;gain(p,e);extra++;}
+    if(c.k==='pick_full'&&c.e===e){G.chain=0;FXSRC=c.uid;gain(p,e);extra++;}}
+  FXSRC=null;
+  log(`${p.name}が${e}を取った${extra?`（さらに${e}の受け取り判定${extra}回）`:''}`);
+  await resolvePending(p);
+}
+const chiefCount=(p,e)=>p.tab.filter(x=>x.els.includes(e)).length;
+function allowedFor(p){const base=p.pos==null?E:[p.pos,nx(p.pos),pv(p.pos)];return base.filter(e=>G.dish[e]>0);}
+function setOver(o){if(!G.over){G.over=o;G.gPend={};G.proof=null;if(G.turnRes)G.turnRes();if(G.pickRes)G.pickRes(null);}}
+function loopWin(p){if(!p.cpu)sfx('win');log(`${p.name}が無限ループを証明した。量産ゴーレム100億体！`,'big');p.golems=1e10;setOver({type:'loop',p,round:G.round});}
+function checkOverflow(){if(G.overflowP){const p=G.overflowP;G.overflowP=null;if(has(p,'prod').length)loopWin(p);else log(`${p.name}の工房で素材が無限に循環している`,'big');}}
+function snapshot(p){return {res:Object.assign({},p.res),hand:p.hand.length,golems:p.golems,tab:p.tab.map(c=>c.uid+':'+(c.tapped?1:0)).sort().join(',')};}
+function proofOk(p,s){return p.golems>s.golems&&E.every(e=>p.res[e]>=s.res[e])&&p.hand.length>=s.hand&&p.tab.map(c=>c.uid+':'+(c.tapped?1:0)).sort().join(',')===s.tab;}
+// ---- CPU ----
+function value(p,c){
+  const k=c.k,tab=p.tab,rnd=G.round,prods=tab.filter(x=>x.k==='prod'&&!x.starter),incs=tab.filter(x=>x.k==='inc'||x.k==='twin');
+  if(tab.some(x=>x.name===c.name))return -5;
+  const base={prod:prods.length?3:7,inc:8,twin:8,conv:2,conv2:3,pick_lo:rnd<=4?6:1,pick_full:rnd<=6?7:2,gt:5,draw_round:rnd<=4?6:1,dis_draw:3,copy:3,order:3,reset:1,cap:rnd<=6?4:2,hcap:1,bless:rnd<=5?5:1,appr:rnd<=4?4:1,dis_any:3,rburn:3,rburn_any:3,herald:rnd<=6?5:2,market:rnd<=6?5:2,rain:4,harvest:5,bonfire:5,mentor:rnd<=6?5:2,mutual:rnd<=6?4:1,beacon:rnd<=6?6:2,
+    sprout:rnd<=4?5:1,loot:3,clod:rnd<=5?5:2,dig:5,dew:2,scout:4,porter:rnd<=5?5:2,seeder:rnd<=5?5:1,reaper:rnd<=5?6:2,joint:2,melt:3,chief:2+2*(c.e?chiefCount(p,c.e):0),rooster:3,bell:4};
+  let v=base[k]??2;
+  if(k==='inc'&&prods.length)v+=2;
+  if(k==='prod'&&incs.length)v+=2;
+  if(k==='conv'||k==='conv2'){const gives=new Set([...incs.map(x=>x.e),...tab.filter(x=>x.k==='gt').map(x=>x.give)]);if(gives.has(c.f))v+=3;if(prods.length)v+=1;}
+  if(['prod','inc','conv','conv2','twin','gt'].includes(k)&&!isLoopTab(tab)&&isLoopTab(tab.concat([c])))v+=15;
+  return v;
+}
+function desire(p){
+  const dd=zero();
+  const hv=p.hand.slice().sort((a,b)=>value(p,b)-value(p,a)).slice(0,3);
+  hv.forEach((c,j)=>{for(const e of c.els)dd[e]+=c.cost[e]*(j===0?2:1);});
+  if(isLoopTab(p.tab))for(const c of p.tab)if(c.k==='prod')for(const e in c.pay)if(dd[e]!=null)dd[e]+=c.pay[e]+3;
+  for(const e of E)dd[e]=Math.max(0,dd[e]-p.res[e]);return dd;
+}
+function cpuPick(p,allowed){
+  const dd=desire(p),full=tot(p.res)>=p.cap;
+  if(full||Math.max(...allowed.map(e=>dd[e]))===0){const opp=zero();G.players.forEach(q=>{if(q!==p){const o=desire(q);E.forEach(e=>opp[e]+=o[e]);}});return allowed.slice().sort((a,b)=>opp[b]-opp[a]||Math.random()-.5)[0];}
+  return allowed.slice().sort((a,b)=>dd[b]-dd[a]||G.dish[b]-G.dish[a]||Math.random()-.5)[0];
+}
+async function cpuTapGains(p){
+  for(const c of p.tab){if(c.tapped)continue;
+    FXSRC=c.uid;
+    if(c.k==='chief'){const n=Math.floor(chiefCount(p,c.e)/2);if(n){c.tapped=true;for(let i=0;i<n;i++){G.chain=0;gain(p,c.e);}log(`${p.name}の${c.name}が${c.e}${n}を得た`);}}
+    if(c.k==='seeder'){c.tapped=true;G.chain=0;gain(p,'木');}
+    if(c.k==='reaper'){c.tapped=true;await gainAny(p,c.name);}}
+}
+async function cpuTurn(p){
+  const tk=G.token;await sleep(300);
+  for(const c of has(p,'reset'))if(!c.tapped&&p.hand.length>=3&&Math.max(0,...p.hand.map(x=>value(p,x)))<4){const k=p.hand.length;G.disc.push(...p.hand);p.hand=[];draw(p,k);c.tapped=true;log(`${p.name}が手札を入れ替えた`);}
+  await cpuTapGains(p);
+  for(const r of has(p,'rooster')){if(r.tapped)continue;const t=p.tab.find(x=>x!==r&&x.tapped&&['chief','reaper','seeder'].includes(x.k));const junk=p.hand.slice().sort((a,b)=>value(p,a)-value(p,b))[0];
+    if(t&&junk&&value(p,junk)<3){p.hand.splice(p.hand.indexOf(junk),1);G.disc.push(junk);t.tapped=false;r.tapped=true;log(`${p.name}の鶏鳴ゴーレムが${t.name}を起こした`);await cpuTapGains(p);}}
+  for(const c of has(p,'loot')){if(c.tapped||!p.hand.length)continue;const junk=p.hand.slice().sort((a,b)=>value(p,a)-value(p,b))[0];if(value(p,junk)<3){p.hand.splice(p.hand.indexOf(junk),1);G.disc.push(junk);draw(p,1);c.tapped=true;}}
+  if(has(p,'melt').length&&G.round>=4){const dd=desire(p);const junk=p.tab.filter(x=>!x.starter&&['sprout','scout','porter','clod','dig','loot','pick_lo','draw_round','appr'].includes(x.k));
+    for(const x of junk.slice(0,2)){const e=cardEls(x).slice().sort((a,b)=>dd[b]-dd[a])[0];if(dd[e]>0){p.tab.splice(p.tab.indexOf(x),1);G.disc.push(x);G.chain=0;gain(p,e);log(`${p.name}が${x.name}を鋳潰して${e}を得た`);}}}
+  const buildPass=async()=>{for(let it=0;it<8;it++){
+    const cand=p.hand.slice().sort((a,b)=>value(p,b)-value(p,a));const top=cand[0];let built=false;
+    for(const c of cand){
+      if(value(p,c)<0)continue;
+      if(c!==top&&top&&value(p,c)<value(p,top)-3){const held=top.els.reduce((a,e)=>a+p.res[e],0),need=top.els.reduce((a,e)=>a+top.cost[e],0);
+        if(c.els.some(e=>top.els.includes(e))&&held*2>=need&&!canPay(p.tab,p.res,top.cost))continue;}
+      G.chain=0;if((await build(p,c))===true){built=true;checkOverflow();render();await sleep(240);break;}}
+    if(!built||G.over||G.token!==tk)break;}};
+  await buildPass();if(G.over||G.token!==tk)return;
+  const mode=has(p,'dis_any').length?'any':has(p,'dis_draw').length?'draw':'base';
+  for(let i=0;i<2;i++){const full=p.hand.length>=p.hcap;const low=p.hand.filter(c=>full||value(p,c)<4).sort((a,b)=>value(p,a)-value(p,b));if(low.length<2||(tot(p.res)>=p.cap&&!full))break;await dismantle(p,low.slice(0,2),mode);}
+  const dd=desire(p);
+  for(const c of has(p,'rburn'))while(p.res[c.e]>0&&dd[c.e]===0&&p.hand.length<p.hcap){p.res[c.e]--;draw(p,1);log(`${p.name}が${c.e}を支払ってドロー`);}
+  await buildPass();if(G.over||G.token!==tk)return;
+  if(loopCheck(p)){loopWin(p);return;}
+  const pm=(G.round>=8||(!G.solo&&G.round>=12))?'max':'surplus';
+  const d2=desire(p);
+  for(let i=0;i<20;i++){const pr=p.tab.find(c=>c.k==='prod'&&canPay(p.tab,p.res,c.pay));if(!pr)break;
+    if(pm==='surplus'){const st=simSt(p);try{pay(st,pr.pay);}catch(x){break;}if(E.some(e=>st.res[e]<p.res[e]&&d2[e]>0))break;}
+    G.chain=0;produceReal(p,pr);checkOverflow();if(G.over)return;}
+  if(p.golems)log(`${p.name}の量産ゴーレムは${p.golems}体`);
+}
+// ---- 進行 ----
+async function run(){
+  const tk=G.token;render();
+  while(!G.over){
+    G.round++;G.phase='prep';G.cur=null;G.window=true;G.picks={};log(`ラウンド ${G.round}`,'round');
+    const mk=G.players.reduce((a,p)=>a+has(p,'market').length,0);
+    E.forEach(e=>G.dish[e]=Math.max(G.dish[e],G.n+1+mk));
+    G.players.forEach(p=>{const extra=(has(p,'sprout').length&&p.hand.length<=4)?1:0;draw(p,2+has(p,'draw_round').length+extra);});
+    for(const p of order()){
+      for(const c of p.tab){
+        FXSRC=c.uid;
+        if(c.k==='market'){const e=await chooseEl(p,'市場ゴーレム：得る素材を選んでください');if(e){G.chain=0;gain(p,e);await resolvePending(p);}}
+        if(c.k==='herald'){G.players.forEach(q=>draw(q,q===p?2:1));}
+        if(c.k==='beacon'){for(const q of order()){await gainAny(q,`${p.name}の灯台`,q===p?2:1);await resolvePending(q);}}
+      }}
+    if(G.token!==tk)return;render();await sleep(450);
+    G.phase='draft';G.players.forEach(p=>p.pos=null);
+    for(let lap=0;lap<3&&!G.over;lap++){G.lap=lap;
+      for(const p of order()){G.cur=p;const al=allowedFor(p);if(!al.length){log(`${p.name}は取れる皿がなかった`);continue;}
+        let e;if(p.cpu){render();await sleep(320);e=cpuPick(p,al);}else{G.allowed=al;e=await new Promise(res=>{G.pickRes=res;render();});G.pickRes=null;G.allowed=[];}
+        if(G.token!==tk||G.over)return;await take(p,e);checkOverflow();render();}}
+    G.window=false;
+    G.phase='turn';
+    for(const p of order()){G.cur=p;render();
+      if(p.cpu)await cpuTurn(p);else await new Promise(res=>{G.turnRes=res;render();});
+      G.turnRes=null;G.proof=null;if(G.token!==tk||G.over){render();return;}
+      p.tab.forEach(c=>c.tapped=false);}
+    G.phase='end';G.cur=null;
+    G.start=(G.start+1)%G.n;
+    if(!G.solo&&G.round>=12){
+      const rk=G.players.slice().sort((a,b)=>b.golems-a.golems||tot(b.res)-tot(a.res)||b.tab.length-a.tab.length);
+      const t=rk[0],ws=rk.filter(q=>q.golems===t.golems&&tot(q.res)===tot(t.res)&&q.tab.length===t.tab.length);
+      log(`12ラウンド終了。${ws.map(w=>w.name).join('と')}の勝利`,'big');setOver({type:'deadline',rk,ws});}
+    render();await sleep(200);
+  }
+  render();
+}
+// ---- 画面 ----
+const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+const me=()=>G?(NET&&NET.view!=null?G.players[NET.view]:G.players.find(p=>!p.cpu)):null;
+// 表示用の量産数（歩いている子が着くまで増やさない）
+const dispG=p=>p.golems>=1e10?p.golems:Math.max(0,p.golems-((G.gPend&&G.gPend[p.i])||0));
+const fmtG=n=>n>=1e10?'100億':n;
+function syncGolemCount(i,emph){
+  const p=G.players[i];if(!p)return;const v=fmtG(dispG(p));
+  const els=[...document.querySelectorAll(`[data-pl="${i}"] .golems`)];
+  if(p===(me()||G.players[0])){const b=document.querySelector('.count.golem b');if(b)els.push(b);}
+  els.forEach(el=>{if(el.textContent===String(v))return;el.textContent=v;
+    if(emph&&el.animate)el.animate([{transform:'scale(1)',color:'',textShadow:'none'},{transform:'scale(1.7)',color:'#e6d2ff',textShadow:'0 0 10px #b07cff,0 0 4px #b07cff',offset:.3},{transform:'scale(1)',color:'',textShadow:'none'}],{duration:560,easing:'ease-out'});});
+  if(emph&&p===(me()||G.players[0])){const st=document.querySelector('.count.golem .sitter');if(st&&st.animate)st.animate([{transform:'translateY(0) scale(1)'},{transform:'translateY(-5px) scale(1.2)',offset:.35},{transform:'translateY(0) scale(1)'}],{duration:380,easing:'ease-out'});}
+}
+const turnOk=p=>G&&!G.over&&G.phase==='turn'&&G.cur&&G.cur===p&&!G.busy&&!G.modal;
+const myTurn=()=>!!me()&&turnOk(me());
+function pc(i){return `var(--p${i})`;}
+const ek=e=>e&&EK[e]?EK[e]:'none';
+function costHTML(c){const ks=Object.keys(c);if(!ks.length)return '<span class="r e-start"><span class="k">初期</span></span>';return ks.map(e=>`<span class="r e-${ek(e)}"><span class="k">${e==='any'?'無':e}</span>${c[e]}</span>`).join('');}
+function resHTML(p){return `<div class="res">${E.map(e=>`<span class="r e-${EK[e]}" data-res="${e}"><span class="k">${e}</span>${p.res[e]}</span>`).join('')}</div>`;}
+function band(c){if(!c.els.length)return `<div class="band" style="--c:var(--${c.starter?'muted':'none'})"></div>`;
+  if(c.els.length===1)return `<div class="band" style="--c:var(--${EK[c.els[0]]})"></div>`;
+  return `<div class="band multi" style="background:linear-gradient(90deg,${c.els.map((e,i)=>`var(--${EK[e]}) ${i/c.els.length*100}% ${(i+1)/c.els.length*100}%`).join(',')})"></div>`;}
+function tabActs(p,c){
+  if(p.cpu||!myTurn())return '';
+  const tappedOthers=p.tab.some(x=>x!==c&&x.tapped),h=p.hand.length;
+  let ok=false;
+  switch(c.k){
+    case 'dismantle':case 'dis_draw':case 'dis_any':ok=h>=2;break;
+    case 'scrap':ok=tot(p.res)>0;break;
+    case 'conv':ok=p.res[c.f]>=1;break;
+    case 'conv2':ok=p.res[c.f]>=2;break;
+    case 'prod':ok=canPay(p.tab,p.res,c.pay);break;
+    case 'rburn':ok=p.res[c.e]>=1&&h<p.hcap;break;
+    case 'rburn_any':ok=tot(p.res)>=2&&h<p.hcap;break;
+    case 'reset':ok=!c.tapped&&h>0;break;
+    case 'loot':ok=!c.tapped&&h>=1;break;
+    case 'dew':case 'joint':ok=!c.tapped&&tot(p.res)>0;break;
+    case 'seeder':case 'reaper':ok=!c.tapped;break;
+    case 'chief':ok=!c.tapped&&Math.floor(chiefCount(p,c.e)/2)>0;break;
+    case 'melt':ok=p.tab.some(x=>!x.starter&&x!==c);break;
+    case 'rooster':ok=!c.tapped&&h>=1&&tappedOthers;break;
+    case 'bell':ok=h>=2&&tappedOthers;break;
+    default:return '';
+  }
+  return `<button class="btn small" data-act="use" data-uid="${c.uid}" ${ok?'':'disabled'}>起動</button>`;
+}
+function artColor(c){return c.els.length?`var(--${EK[c.els[0]]})`:c.starter?'var(--muted)':'var(--none)';}
+function costDots(cost){return Object.keys(cost).map(e=>`<span class="cd" style="--c:var(--${e==='any'?'none':EK[e]})" title="${e==='any'?'好きな素材':e}${cost[e]}">${cost[e]}</span>`).join('');}
+function cardHTML(c,where,p){
+  const can=where==='hand'&&myTurn()&&!p.tab.some(x=>x.name===c.name)&&canPay(p.tab,p.res,c.cost);
+  const cls=['card',c.tapped?'tapped':'',c.starter?'starter':'',where==='hand'&&G.sel.has(c.uid)?'sel':'',can?'can':''].join(' ');
+  const tact=where==='tab'?tabActs(p,c):'';
+  const ready=myTurn()&&(can||(tact&&!tact.includes('disabled')&&c.k!=='scrap'));
+  const acts=`${where==='hand'&&myTurn()?`<button class="btn small" data-act="build" data-uid="${c.uid}" ${can?'':'disabled'}>作る</button>`:''}${tact}`;
+  const inner=`<div class="${cls}${ready?' ready':''}" data-tip="${c.uid}" ${where==='hand'?`tabindex="0" aria-label="${esc(c.name)}：${esc(c.text)}"`:`tabindex="0" aria-label="${esc(c.name)}：${esc(c.text)}"`} style="--c:${artColor(c)}">${band(c)}<div class="costrow">${costDots(c.cost)}</div><div class="art" aria-hidden="true">ILLUST</div><div class="bd">
+    <div class="nm">${esc(c.name)}</div><div class="tx">${esc(c.text)}</div>${acts?`<div class="acts">${acts}</div>`:''}</div></div>`;
+  return where==='tab'?`<div class="slot ${c.tapped?'tapped':''}">${inner}</div>`:inner;
+}
+function findCard(uid){for(const q of G.players){const c=q.hand.find(x=>x.uid===uid)||q.tab.find(x=>x.uid===uid);if(c)return {c,q};}return null;}
+function tipHTML(c,q){
+  const dup=!c.starter&&q===me()&&q.hand.includes(c)&&q.tab.some(x=>x.name===c.name);
+  return `${band(c)}<div class="in"><div class="cost">${costHTML(c.cost)}</div><div class="nm">${esc(c.name)}</div><div class="role">${esc(c.role)}${c.tapped?'・横向き（使用済み）':''}</div><div class="tx">${esc(c.text)}</div>${dup?'<div class="note">工房に同名のネームドゴーレムがいるため作れません</div>':''}</div>`;
+}
+function dishSVG(){
+  const P={木:[150,48],火:[246,118],土:[209,230],金:[91,230],水:[54,118]};
+  const al=(G.phase==='draft'&&G.cur&&G.cur===me())?G.allowed:[];
+  const toks=G.players.map(p=>p.pos?(()=>{const [x,y]=P[p.pos];const a=(p.i/G.n)*Math.PI*2-Math.PI/2;return `<circle cx="${x+Math.cos(a)*42}" cy="${y+Math.sin(a)*42}" r="7" fill="${pc(p.i)}" stroke="var(--panel)" stroke-width="2"><title>${esc(p.name)}</title></circle>`;})():'').join('');
+  const lines=E.map(e=>{const [x1,y1]=P[e],[x2,y2]=P[nx(e)];const dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy);return `<line x1="${x1+dx/l*36}" y1="${y1+dy/l*36}" x2="${x2-dx/l*36}" y2="${y2-dy/l*36}" stroke="var(--line)" stroke-width="2"/>`;}).join('');
+  const dishes=E.map(e=>{const [x,y]=P[e];const ok=al.includes(e);return `<g class="dish ${ok?'ok':''}" data-dish="${e}" ${ok?`data-act="dish" data-e="${e}" tabindex="0" role="button" aria-label="${e}の皿から取る"`:''}><circle class="base" cx="${x}" cy="${y}" r="31" fill="color-mix(in srgb,var(--${EK[e]}) ${ok?28:14}%,var(--panel))" stroke="var(--${EK[e]})"/><text x="${x}" y="${y-4}" text-anchor="middle" font-size="17" font-weight="700" fill="var(--${EK[e]})" style="font-family:var(--display)">${e}</text><text x="${x}" y="${y+16}" text-anchor="middle" font-size="14" fill="var(--ink)">${G.dish[e]}</text></g>`;}).join('');
+  return `<svg class="dishes" viewBox="0 0 300 280" role="img" aria-label="素材皿">${lines}${dishes}${toks}</svg>`;
+}
+function playersHTML(){
+  return `<div class="who">${G.players.map(p=>`<div class="pl ${G.cur===p?'active':''}" data-pl="${p.i}" style="--pc:${pc(p.i)}">
+    <div class="row"><span class="nm">${esc(p.name)}${p.away?'<span class="sub">（離席・CPU代行）</span>':''}</span><span class="spacer"></span><span class="stat">量産 <span class="golems">${fmtG(dispG(p))}</span></span></div>
+    ${resHTML(p)}
+    <div class="row"><span class="stat">素材 <b>${tot(p.res)}/${p.cap}</b></span><span class="stat">手札 <b>${p.hand.length}/${p.hcap}</b></span><span class="stat">工房 <b>${p.tab.length}</b></span></div>
+    ${p!==me()?`<div class="tags">${p.tab.filter(c=>!c.starter).map(c=>`<span class="tag ${c.starter?'e-start':'e-'+ek(c.els[0])} ${c.tapped?'tap':''}" data-tip="${c.uid}" tabindex="0">${esc(c.name.replace('ゴーレム',''))}</span>`).join('')}</div>`:''}
+  </div>`).join('')}</div>`;
+}
+function phaseText(){
+  if(!G.cur)return G.phase==='prep'?'補充とドロー':'ラウンド終了';
+  if(G.phase==='draft')return G.cur!==me()?`${G.cur.name}が素材を選んでいます`:`あなたの番：皿を選んで素材を1個取る（${G.lap+1}周目／3）`;
+  if(G.phase==='turn')return G.cur!==me()?`${G.cur.name}のターン`:'あなたのターン';
+  return '';
+}
+function instr(){
+  if(G.over)return {mine:false,t:'ゲーム終了',d:G.over.type==='loop'?`${G.over.p.name}が無限ループを完成させました`:'12ラウンドが終わりました'};
+  if(G.modal){const mo=G.players[G.modal.owner];if(!mo||mo===me())return {mine:true,t:'選んでください',d:G.modal.title};return {mine:false,t:'他のプレイヤーを待っています',d:`${mo.name}が選んでいます`};}
+  const p=G.cur,mine=p&&p===me();
+  if(mine&&G.phase==='draft')return {mine:true,t:'素材を1個取ってください',d:`光っている皿を押します。1個目は好きな皿、2個目からは今の皿か隣の皿（${G.lap+1}周目／3）`};
+  if(mine&&G.phase==='turn'&&G.proof)return {mine:true,t:'ループを証明してください',d:'生産から一周回して、工房の向き・素材・手札を宣言時の状態に戻したら「一周完了」を押します'};
+  if(mine&&G.phase==='turn')return {mine:true,t:'あなたのターンです',d:'手札からネームドゴーレムを作り、工房の効果を使ってください。終わったら「ターン終了」を押します'};
+  return {mine:false,t:'他のプレイヤーを待っています',d:phaseText()};
+}
+let DETAIL_UID=null;
+function detailHTML(){const f=DETAIL_UID!=null&&findCard(DETAIL_UID);return f?tipHTML(f.c,f.q):'<p class="empty">カードにマウスを乗せると、ここに詳細が出ます。</p>';}
+function hideTip(){const t=document.getElementById('tip');if(t)t.hidden=true;}
+function showTip(el){
+  if(!G)return;const f=findCard(+el.dataset.tip);if(!f)return hideTip();
+  const dp=document.getElementById('detail');
+  if(dp){DETAIL_UID=f.c.uid;dp.innerHTML=tipHTML(f.c,f.q);return;}
+  const t=document.getElementById('tip');t.innerHTML=tipHTML(f.c,f.q);t.hidden=false;
+  if(matchMedia('(max-width:760px)').matches){t.classList.add('sheet');t.style.left='';t.style.top='';return;}
+  t.classList.remove('sheet');
+  const r=el.getBoundingClientRect(),w=t.offsetWidth,h=t.offsetHeight,vw=innerWidth,vh=innerHeight;
+  let x=r.right+10;if(x+w>vw-8)x=r.left-w-10;if(x<8)x=Math.min(vw-w-8,Math.max(8,r.left));
+  let y=Math.min(Math.max(8,r.top),vh-h-8);t.style.left=x+'px';t.style.top=y+'px';
+}
+function render(){
+  if(typeof document==='undefined')return;hideTip();
+  const app=document.getElementById('app');
+  if(!G){app.classList.remove('game');app.innerHTML=NET?lobbyHTML():setupHTML();return;}
+  const p=me()||G.players[0];
+  const ins=instr();
+  app.classList.add('game');
+  {const gp=(me()||G.players[0]).golems;G.gearSpin=G.lastGolems!=null&&gp>G.lastGolems?!G.gearSpin:G.gearSpin;G.lastGolems=gp;}
+  app.innerHTML=`<div class="instr ${ins.mine?'mine':''}"><div class="instr-text" role="status" aria-live="polite"><b>${esc(ins.t)}</b><span>${esc(ins.d)}</span></div><div class="instr-acts">${myTurn()?(G.proof?`<button class="btn" data-act="proof-cancel">証明をやめる</button><button class="btn primary" data-act="proof-done">一周完了</button>`:`<button class="btn" data-act="declare">ループ宣言</button><button class="btn primary" data-act="end">ターン終了</button>`):''}</div></div>
+  <header class="top"><h1 class="brand">無限ゴーレム工房<small>UNLIMITED GOLEM WORKS</small></h1>
+    <div class="meter"><span class="chip">ラウンド <b>${G.round}${G.solo?'':' / 12'}</b></span><span class="chip">山札 <b>${G.deck.length}</b></span><span class="chip">捨て札 <b>${G.disc.length}</b></span><span class="chip">スタート <b>${esc(G.players[G.start].name)}</b></span></div>
+    <span class="spacer"></span><button class="btn toggle" data-act="sound" aria-pressed="${SOUND}">効果音 ${SOUND?'オン':'オフ'}</button><button class="btn" data-act="rules">ルール</button><button class="btn" data-act="quit">${NET?'部屋を出る':'<span class="lg">モード選択へ</span>戻る'}</button></header>
+  <div class="grid ${G.phase==='draft'||G.phase==='prep'?'draft':G.phase==='turn'?'play':''}">
+    <div class="col midcol">
+      ${G.warn&&(G.warnI==null||(me()&&G.warnI===me().i))?`<div class="banner warn">${esc(G.warn)}</div>`:''}
+
+      <section class="panel tabpanel"><h2>あなたの工房<span class="counts"><span class="count">ネームドゴーレム <b>${p.tab.length}</b>体</span><span class="count golem"><span class="sitter">${golemSVG('sit')}</span>量産ゴーレム <b>${fmtG(dispG(p))}</b>体</span></span></h2>
+        <div class="cards">${p.tab.map(c=>cardHTML(c,'tab',p)).join('')}</div></section>
+      <section class="panel hand"><h2>手札<span class="sub">${p.hand.length}/${p.hcap}枚</span></h2>
+        ${p.hand.length?`<div class="cards" style="--n:${Math.max(7,p.hand.length)}">${p.hand.map(c=>cardHTML(c,'hand',p)).join('')}</div>`:'<div class="empty">手札がありません。</div>'}</section>
+    </div>
+    <aside class="col logcol rightband"><section class="panel dishpanel"><h2>素材皿<span class="sub">隣の皿へだけ動ける</span></h2>${dishSVG()}</section><section class="panel"><h2>工房の状況<span class="sub">全プレイヤー</span></h2>${playersHTML()}</section>
+      <section class="panel"><h2>記録</h2><div class="log">${G.log.map(l=>`<div class="ln ${l.cls}">${esc(l.t)}</div>`).join('')}</div></section></aside>
+  </div>
+  ${G.modal&&(G.modal.owner==null||G.players[G.modal.owner]===me())?`<div class="overlay"><div class="dlg ${G.modal.opts.some(o=>o.card)?'wide':''}" role="dialog" aria-modal="true"><h3>${esc(G.modal.title)}</h3><div class="opts">${G.modal.opts.map((o,i)=>o.card?`<button class="pickcard" data-act="choose" data-i="${i}">${tipHTML(o.card,p)}</button>`:`<button class="e-${ek(o.el)}" data-act="choose" data-i="${i}">${esc(o.label)}</button>`).join('')}</div>${G.modal.cancel?'<div class="bar"><button class="btn" data-act="choose-cancel">キャンセル</button></div>':''}</div></div>`:''}
+  ${G.over&&!G.over.closed?overHTML():''}${netBar()}`;
+  netAfterRender();
+  if(!G.fxPrev){G.fxPrev={};G.players.forEach(q=>G.fxPrev[q.i]=Object.assign({},q.res));G.fxq=[];}
+  else requestAnimationFrame(playFx);
+}
+function overHTML(){
+  const o=G.over;let body='';
+  if(o.type==='loop'){const you=o.p===me();body=`<p class="win">${you?'無限ループ完成':esc(o.p.name)+'の勝利'}</p><p>${esc(o.p.name)}が${o.round}ラウンド目に無限ループを証明し、量産ゴーレム100億体に到達しました。${G.solo?`ソロの記録は${o.round}ラウンドです。`:''}</p>`;}
+  else{body=`<p class="win">${o.ws.some(w=>w===me())?'あなたの勝利':esc(o.ws.map(w=>w.name).join('と'))+'の勝利'}</p><p>12ラウンドが終わりました。量産ゴーレム、素材の合計、工房のネームドゴーレム数の順で比べています。</p>
+    <div class="rank">${o.rk.map((q,i)=>`<div><b>${i+1}</b><span style="color:${pc(q.i)};font-weight:700">${esc(q.name)}</span><span>量産 <b>${q.golems}</b>・素材 <b>${tot(q.res)}</b>・工房 <b>${q.tab.length}</b></span></div>`).join('')}</div>`;}
+  return `<div class="overlay"><div class="dlg" role="dialog" aria-modal="true">${body}<div class="bar"><button class="btn" data-act="close">盤面を見る</button>${!NET?'<button class="btn primary" data-act="quit">もう一度遊ぶ</button>':NET.role==='host'?'<button class="btn primary" data-act="net-lobby">部屋に戻る</button>':'<button class="btn" data-act="quit">部屋を出る</button>'}</div></div></div>`;
+}
+let SETUP_STEP='mode';
+function setupHTML(){
+  const body=SETUP_STEP==='mode'?`<div class="modes three">
+    <button class="mode" data-act="start" data-n="0"><b>ソロ</b></button>
+    <button class="mode" data-act="pick-cpu"><b>CPU戦</b></button>
+    <button class="mode" data-act="net-menu"><b>オンライン</b></button></div>`
+   :`<p class="ask">CPUの人数を選んでください</p><div class="modes four">
+    ${[1,2,3,4].map(n=>`<button class="mode" data-act="start" data-n="${n}"><b>${n}体</b></button>`).join('')}</div>
+    <div><button class="btn" data-act="pick-back">戻る</button></div>`;
+  return `<div class="setup"><h1>無限ゴーレム工房<small>UNLIMITED GOLEM WORKS</small></h1>
+  <p>ゴーレムがゴーレムを作る工房を組み、最初に無限ループを完成させた人の勝ちです。12ラウンド以内に誰も完成しなければ、量産ゴーレムが一番多い人が勝ちます。</p>
+  ${body}
+  <div><button class="btn" data-act="rules">ルールブックを読む</button></div></div>`;
+}
+// ---- 入力 ----
+async function act(fn){if(G.busy)return;G.busy=true;G.warn='';G.warnI=ACT_P?ACT_P.i:null;G.chain=0;try{await fn();}finally{G.busy=false;checkOverflow();if(G.cur&&G.cur.away&&G.phase==='turn'&&G.turnRes){G.proof=null;G.turnRes();}render();}}
+async function useCard(p,c){
+  FXSRC=c.uid;
+  const discard=cs=>cs.forEach(x=>{p.hand.splice(p.hand.indexOf(x),1);G.disc.push(x);});
+  const pickTapped=async()=>{const opts=p.tab.filter(x=>x!==c&&x.tapped).map(x=>({v:x.uid,label:x.name,el:x.els[0]}));const v=await chooseOpt(p,`${c.name}：縦向きに戻すネームドゴーレムを選んでください`,opts,null,true);return p.tab.find(x=>x.uid===v);};
+  switch(c.k){
+    case 'dismantle':case 'dis_draw':case 'dis_any':{
+      const cs=await askHand(p,`${c.name}：捨てる手札を選んでください`,2);if(!cs)return;
+      const els=c.k==='dis_any'?E:[...new Set(cs.flatMap(x=>cardEls(x)))];
+      const e=els.length===1?els[0]:await askEl(p,`${c.name}：得る素材を選んでください`,els);if(e==null)return;
+      discard(cs);G.chain=0;gain(p,e);if(c.k==='dis_draw')draw(p,1);
+      log(`${p.name}が手札2枚を解体して${e}を得た${c.k==='dis_draw'?'（さらに1枚ドロー）':''}`);return;}
+    case 'scrap':{const e=await askEl(p,'廃材ゴーレム：捨てる素材を選んでください',E.filter(x=>p.res[x]>0));if(e==null)return;p.res[e]--;log(`${p.name}が${e}を1つ捨てた`);return;}
+    case 'conv':case 'conv2':{const k=c.k==='conv2'?2:1;if(p.res[c.f]<k)return;p.res[c.f]-=k;gain(p,c.t);log(`${p.name}が${c.f}${k}を${c.t}1に変換した`);return;}
+    case 'prod':{if(!canPay(p.tab,p.res,c.pay))return;if(!(await payReal(p,c.pay,c.name)))return;p.golems++;if(fxOn()){G.gPend[p.i]=(G.gPend[p.i]||0)+1;if(G.fxHop.length<6)G.fxHop.push(c.uid);}fireInc(realSt(p));for(const _ of has(p,'order'))draw(p,1);sfx('golem');log(`${p.name}が量産ゴーレムを作った（計${p.golems}体）`);return;}
+    case 'rburn':p.res[c.e]--;draw(p,1);log(`${p.name}が${c.e}を支払ってドロー`);return;
+    case 'rburn_any':{const r=Object.assign({},p.res),picks=[];for(let i=0;i<2;i++){const e=await askEl(p,`写字生ゴーレム：支払う素材を選んでください（${i+1}/2）`,E.filter(x=>r[x]>0),r);if(e==null)return;r[e]--;picks.push(e);}
+      picks.forEach(e=>p.res[e]--);draw(p,1);log(`${p.name}が素材2を支払ってドロー`);return;}
+    case 'reset':{const k=p.hand.length;G.disc.push(...p.hand);p.hand=[];draw(p,k);c.tapped=true;log(`${p.name}が手札${k}枚を入れ替えた`);return;}
+    case 'loot':{const cs=await askHand(p,'火花ゴーレム：捨てる手札を選んでください',1);if(!cs)return;discard(cs);draw(p,1);c.tapped=true;log(`${p.name}が手札1枚を捨てて1枚ドロー`);return;}
+    case 'dew':{const e=await askEl(p,'水滴ゴーレム：変える素材を選んでください（相生の次になる）',E.filter(x=>p.res[x]>0));if(e==null)return;p.res[e]--;gain(p,nx(e));c.tapped=true;log(`${p.name}が${e}を${nx(e)}に変えた`);return;}
+    case 'joint':{const a=await askEl(p,'継ぎ手ゴーレム：手放す素材を選んでください',E.filter(x=>p.res[x]>0));if(a==null)return;const b=await askEl(p,'継ぎ手ゴーレム：受け取る素材を選んでください',E);if(b==null)return;p.res[a]--;gain(p,b);c.tapped=true;log(`${p.name}が${a}を${b}と入れ替えた`);return;}
+    case 'seeder':gain(p,'木');c.tapped=true;log(`${p.name}が種まきで木1を得た`);return;
+    case 'reaper':{const e=await askEl(p,'収穫ゴーレム：得る素材を選んでください',E);if(e==null)return;gain(p,e);c.tapped=true;log(`${p.name}が収穫で${e}を得た`);return;}
+    case 'chief':{const n=Math.floor(chiefCount(p,c.e)/2);for(let i=0;i<n;i++){G.chain=0;gain(p,c.e);}c.tapped=true;log(`${p.name}の${c.name}が${c.e}${n}を得た`);return;}
+    case 'melt':{const opts=p.tab.filter(x=>!x.starter&&x!==c).map(x=>({v:x.uid,label:x.name,el:x.els[0]}));const v=await chooseOpt(p,'鋳潰しゴーレム：捨て札にするネームドゴーレムを選んでください',opts,null,true);const t=p.tab.find(x=>x.uid===v);if(!t)return;
+      const e=cardEls(t).length===1?cardEls(t)[0]:await askEl(p,'鋳潰しゴーレム：得る素材を選んでください',cardEls(t));if(e==null)return;p.tab.splice(p.tab.indexOf(t),1);G.disc.push(t);gain(p,e);log(`${p.name}が${t.name}を鋳潰して${e}を得た`);return;}
+    case 'rooster':{const cs=await askHand(p,'鶏鳴ゴーレム：捨てる手札を選んでください',1);if(!cs)return;const t=await pickTapped();if(!t)return;discard(cs);t.tapped=false;c.tapped=true;log(`${p.name}の鶏鳴ゴーレムが${t.name}を起こした`);return;}
+    case 'bell':{const cs=await askHand(p,'暁鐘ゴーレム：捨てる手札を選んでください',2);if(!cs)return;const t=await pickTapped();if(!t)return;discard(cs);t.tapped=false;log(`${p.name}の暁鐘ゴーレムが${t.name}を起こした`);return;}
+  }
+}
+const GAME_ACTS=['choose','choose-cancel','dish','build','use','declare','proof-done','proof-cancel','end'];
+let ACT_P=null;
+// 盤面への操作（ローカルのクリックと、オンラインのゲストから届いた操作の両方がここを通る）
+function handleAct(a,d,p){
+  if(a==='choose'&&G.modal&&G.modal.owner===p.i){const m=G.modal,o=m.opts[+d.i];if(!o)return;G.modal=null;m.res(o.v);render();return;}
+  if(a==='choose-cancel'&&G.modal&&G.modal.owner===p.i&&G.modal.cancel){const m=G.modal;G.modal=null;m.res(null);render();return;}
+  if(a==='dish'){if(G.pickRes&&G.cur===p&&G.allowed.includes(d.e))G.pickRes(d.e);return;}
+  if(!turnOk(p))return;
+  ACT_P=p;
+  const card=u=>p.hand.find(c=>c.uid===+u)||p.tab.find(c=>c.uid===+u);
+  if(a==='build')act(async()=>{const c=card(d.uid);if(!c)return;G.sel.delete(c.uid);const r=await build(p,c);if(r===false){sfx('deny');G.warn='素材が足りないか、工房に同名のネームドゴーレムがいるため作れません。';}});
+  if(a==='use')act(async()=>{const c=card(d.uid);if(c&&p.tab.includes(c))await useCard(p,c);});
+  if(a==='declare')act(async()=>{if(loopCheck(p)){loopWin(p);return;}G.proof=snapshot(p);log(`${p.name}がループ証明を始めた`);});
+  if(a==='proof-done')act(async()=>{if(proofOk(p,G.proof))loopWin(p);else{G.warn='まだ証明できていません。量産ゴーレムが増え、素材と手札が宣言時以上、工房の向きが宣言時と同じになっている必要があります。';}});
+  if(a==='proof-cancel'){G.proof=null;render();return;}
+  if(a==='end'){G.sel.clear();G.proof=null;G.turnRes&&G.turnRes();}
+}
+// ---- オンライン対戦 ----
+// 部屋を作った人のブラウザがホストとしてゲームを進め、サーバーはメッセージを中継するだけ
+const NET_SERVER=(()=>{try{const q=new URLSearchParams(location.search).get('server');if(q)return q;}catch(e){}return 'wss://golem-works.chrischangbeil.workers.dev';})();
+const NET_MAX=5;
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}},
+  sget(k){try{return sessionStorage.getItem(k);}catch(e){return null;}},sset(k,v){try{sessionStorage.setItem(k,v);}catch(e){}}};
+function netCid(){let c=store.sget('golem-cid');if(!c){c=Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);store.sset('golem-cid',c);}return c;}
+function netNewCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];return c;}
+function netSend(m){if(NET&&NET.ws&&NET.ws.readyState===1)NET.ws.send(JSON.stringify(m));}
+function netOpen(code,create){
+  const ws=new WebSocket(`${NET_SERVER}/room/${code}?cid=${encodeURIComponent(NET.cid)}&name=${encodeURIComponent(NET.name)}${create?'&create=1':''}`);
+  NET.ws=ws;NET.code=code;NET.status='connecting';
+  ws.onopen=()=>{NET.status='open';NET.retry=0;clearInterval(NET.pinger);NET.pinger=setInterval(()=>{if(ws.readyState===1)ws.send('ping');},25000);render();};
+  ws.onmessage=ev=>{if(ev.data==='pong')return;let m;try{m=JSON.parse(ev.data);}catch(e){return;}netOnMsg(m);};
+  ws.onclose=ev=>{if(!NET||NET.ws!==ws)return;clearInterval(NET.pinger);
+    if(ev.code===4000||NET.closing)return;
+    if(ev.code===4001){NET.err='同じ画面が別の場所で開かれたため、切断しました';NET.status='closed';render();return;}
+    NET.status='lost';render();
+    const n=(NET.retry=(NET.retry||0)+1);if(n>10){NET.err='サーバーに接続できませんでした';render();return;}
+    setTimeout(()=>{if(NET&&NET.ws===ws)netOpen(NET.code,false);},Math.min(8000,600*2**(n-1)));};
+}
+function netStart(role,code,name){
+  name=(name||'').trim().slice(0,12)||'名無し';store.set('golem-name',name);
+  NET={role,cid:netCid(),name,code,roster:[],host:null,cpus:0,view:null,seats:null,status:'connecting',stage:'room',err:''};
+  G=null;if(role==='guest')store.sset('golem-room',code);netOpen(code,role==='host');render();
+}
+function netLeave(){
+  if(NET){NET.closing=true;if(NET.role==='host')netSend({t:'close'});try{NET.ws&&NET.ws.close(1000);}catch(e){}clearInterval(NET.pinger);}
+  store.sset('golem-room','');if(G)G.token={};NET=null;G=null;SETUP_STEP='mode';render();
+}
+function netOnMsg(m){
+  if(m.t==='error'){const msg={taken:'その部屋はもう使われています',noroom:'その合言葉の部屋が見つかりません',full:'部屋が満員です',bad:'接続に失敗しました'}[m.e]||'接続に失敗しました';
+    if(m.e==='taken'&&NET.role==='host'&&!G){netOpen(netNewCode(),true);return;}
+    store.sset('golem-room','');NET.closing=true;NET.stage='menu';NET.err=msg;G=null;render();return;}
+  if(m.t==='hello'){NET.host=m.host;return;}
+  if(m.t==='roster'){NET.roster=m.members;NET.host=m.host;if(NET.role==='host')netRosterChanged();else render();return;}
+  if(m.t==='hostgone'){store.sset('golem-room','');const keep=NET;NET.closing=true;try{keep.ws.close(1000);}catch(e){}NET={stage:'menu',err:'ホストが部屋を閉じました',name:keep.name,cid:keep.cid};G=null;render();return;}
+  if(m.t==='act'&&NET.role==='host'&&G){const seat=NET.seats?NET.seats.indexOf(m.from):-1;const p=G.players[seat];if(p&&!p.cpu)handleAct(m.a,m.d||{},p);return;}
+  if(m.t==='state'&&NET.role==='guest')netApply(m.s);
+}
+// ホスト：メンバーの出入り
+function netRosterChanged(){
+  if(!G){NET.cpus=Math.min(NET.cpus,Math.max(0,NET_MAX-NET.roster.length));render();netPush(true);return;}
+  const here=new Set(NET.roster.map(x=>x.cid));
+  NET.seats.forEach((cid,i)=>{if(i===NET.view||!cid)return;const p=G.players[i];if(!p)return;
+    if(!here.has(cid)&&!p.away){p.away=true;p.cpu=true;log(`${p.name}の接続が切れたので、CPUが代わりに進めます`);netReleaseSeat(p);}
+    else if(here.has(cid)&&p.away){p.away=false;p.cpu=false;log(`${p.name}が戻ってきた`);}});
+  render();netPush(true);
+}
+function netReleaseSeat(p){
+  if(G.modal&&G.modal.owner===p.i){const m=G.modal;G.modal=null;m.res(m.cancel?null:m.opts[0].v);}
+  if(G.cur===p&&G.pickRes){const al=G.allowed;G.pickRes(cpuPick(p,al));}
+  else if(G.cur===p&&G.phase==='turn'&&G.turnRes&&!G.busy){G.proof=null;G.turnRes();}
+}
+function netHostStart(){
+  if(!NET||NET.role!=='host'||G)return;
+  const ms=NET.roster.slice().sort((a,b)=>(a.cid===NET.cid?-1:b.cid===NET.cid?1:0));
+  if(ms.length+NET.cpus<2)return;
+  NET.seats=ms.map(x=>x.cid).concat(Array(NET.cpus).fill(null));NET.view=0;
+  newGame(NET.cpus,{humans:ms.map(x=>x.name)});
+}
+// ホスト：盤面を送る（描画のたびに貯めて、まとめて送る）
+function netSnap(){
+  if(!G)return {lobby:true,cpus:NET.cpus};
+  const ix=q=>q?q.i:null,o=G.over;
+  return {n:G.n,solo:G.solo,online:true,players:G.players.map(p=>Object.assign({},p,{pending:undefined})),dish:G.dish,round:G.round,phase:G.phase,start:G.start,cur:ix(G.cur),lap:G.lap,
+    log:G.log.slice(0,80),modal:G.modal?{title:G.modal.title,opts:G.modal.opts,cancel:G.modal.cancel,owner:G.modal.owner}:null,busy:G.busy,
+    over:o?{type:o.type,round:o.round,p:ix(o.p),rk:o.rk?o.rk.map(ix):null,ws:o.ws?o.ws.map(ix):null}:null,
+    allowed:G.allowed,warn:G.warn,warnI:G.warnI,proof:!!G.proof,window:G.window,picks:G.picks,deckN:G.deck.length,discN:G.disc.length,seats:NET.seats,fx:NET.fxAcc};
+}
+function netPush(now){
+  if(!NET||NET.role!=='host')return;
+  if(NET.pushT)return;
+  NET.pushT=setTimeout(()=>{NET&&(NET.pushT=null);if(!NET)return;netSend({t:'state',s:netSnap()});NET.fxAcc={q:[],hop:[],built:{}};},now?0:40);
+}
+function netAfterRender(){
+  if(!NET||!G)return;
+  if(NET.role==='host')netPush();
+  else{const ins=instr();if(ins.mine&&!NET.wasMine)sfx('sel');NET.wasMine=ins.mine;}
+}
+// ゲスト：届いた盤面を組み立てる
+function netApply(s){
+  if(s.lobby){NET.cpus=s.cpus;if(G){G=null;}render();return;}
+  const prev=G,players=s.players;
+  NET.seats=s.seats;NET.view=s.seats?s.seats.indexOf(NET.cid):-1;if(NET.view<0)NET.view=null;
+  const gPend=prev?prev.gPend||{}:{};
+  if(prev&&!G.fast)players.forEach(p=>{const q=prev.players[p.i];if(q&&p.golems<1e10){const inc=p.golems-q.golems;if(inc>0)gPend[p.i]=(gPend[p.i]||0)+inc;}});
+  const mine=NET.view!=null&&players[NET.view];
+  if(prev&&mine&&prev.players[NET.view]&&mine.golems>prev.players[NET.view].golems)sfx('golem');
+  const o=s.over;
+  G={n:s.n,solo:s.solo,online:true,players,dish:s.dish,round:s.round,phase:s.phase,start:s.start,cur:s.cur==null?null:players[s.cur],lap:s.lap,log:s.log,
+    modal:s.modal?Object.assign({},s.modal,{res(){}}):null,busy:s.busy,
+    over:o?{type:o.type,round:o.round,p:o.p==null?null:players[o.p],rk:o.rk?o.rk.map(i=>players[i]):null,ws:o.ws?o.ws.map(i=>players[i]):null,closed:!!(prev&&prev.over&&prev.over.closed)}:null,
+    allowed:s.allowed||[],warn:s.warn,warnI:s.warnI,proof:s.proof?{}:null,window:s.window,picks:s.picks,deck:{length:s.deckN},disc:{length:s.discN},
+    token:{},sel:prev?prev.sel:new Set(),fast:false,chain:0,fxPrev:prev?prev.fxPrev:null,fxq:(s.fx&&s.fx.q)||[],fxHop:(s.fx&&s.fx.hop)||[],fxBuilt:(s.fx&&s.fx.built)||{},gPend,gWalk:prev?prev.gWalk:{},
+    gearSpin:prev?prev.gearSpin:false,lastGolems:prev?prev.lastGolems:null};
+  if(o&&!(prev&&prev.over))sfx('win');
+  render();
+}
+function netBar(){
+  if(!NET)return '';
+  if(NET.status==='lost'||NET.status==='connecting')return `<div class="netbar" role="status">再接続しています…</div>`;
+  if(G&&NET.role==='guest'&&NET.host&&!NET.roster.some(x=>x.cid===NET.host))return `<div class="netbar" role="status">ホストの接続を待っています…</div>`;
+  return '';
+}
+function lobbyHTML(){
+  const head=`<h1>無限ゴーレム工房<small>UNLIMITED GOLEM WORKS ・ オンライン</small></h1>`;
+  if(NET.stage==='menu'){const nm=esc(NET.name||store.get('golem-name',''));
+    return `<div class="setup">${head}
+    <div class="net">${NET.err?`<p class="err" role="alert">${esc(NET.err)}</p>`:''}
+      <label>あなたの名前<input id="net-name" maxlength="12" value="${nm}" placeholder="12文字まで" autocomplete="nickname"></label>
+      <div class="row"><button class="btn primary" data-act="net-create">部屋を作る</button></div>
+      <div class="row"><label>合言葉<input id="net-code" class="code" maxlength="4" placeholder="ABCD" autocapitalize="characters" autocomplete="off"></label><button class="btn" data-act="net-join">部屋に入る</button></div>
+      <div><button class="btn" data-act="net-back">戻る</button></div></div></div>`;}
+  const host=NET.role==='host',n=NET.roster.length,total=n+NET.cpus;
+  const st=NET.status==='open'?'':NET.status==='lost'?'（再接続しています…）':'（接続しています…）';
+  return `<div class="setup">${head}
+  <div class="net"><p>合言葉${st}</p><div class="roomcode" aria-label="合言葉 ${esc((NET.code||'').split('').join(' '))}">${esc(NET.code||'----')}</div>
+    <p>この合言葉を一緒に遊ぶ人に伝えてください。${NET_MAX}人まで入れます。</p>
+    <ul class="members">${NET.roster.map(x=>`<li>${esc(x.name)}${x.cid===NET.host?'<span class="tag2">ホスト</span>':''}${x.cid===NET.cid?'<span class="tag2">あなた</span>':''}</li>`).join('')}${Array.from({length:NET.cpus},(_,i)=>`<li>${esc(NAMES[i+1])}<span class="tag2">CPU</span></li>`).join('')}</ul>
+    ${host?`<div class="stepper">CPUを足す<button class="btn" data-act="net-cpu-" ${NET.cpus<=0?'disabled':''} aria-label="CPUを減らす">−</button><b>${NET.cpus}</b><button class="btn" data-act="net-cpu+" ${total>=NET_MAX?'disabled':''} aria-label="CPUを増やす">＋</button></div>
+      <div class="row"><button class="btn primary" data-act="net-go" ${total<2||NET.status!=='open'?'disabled':''}>ゲーム開始（${total}人）</button></div>`
+      :`<p>ホストがゲームを開始するのを待っています。</p>`}
+    <div><button class="btn" data-act="net-leave">部屋を出る</button></div></div></div>`;
+}
+function netUi(a,t){
+  if(a==='net-menu'){NET={stage:'menu',err:'',name:store.get('golem-name','')};render();setTimeout(()=>document.getElementById('net-name')?.focus(),0);return;}
+  if(a==='net-back'){NET=null;render();return;}
+  if(a==='net-create'){const nm=document.getElementById('net-name')?.value;netStart('host',netNewCode(),nm);return;}
+  if(a==='net-join'){const nm=document.getElementById('net-name')?.value,code=(document.getElementById('net-code')?.value||'').trim().toUpperCase();
+    if(!/^[A-Z0-9]{4}$/.test(code)){NET.err='合言葉は4文字です';NET.name=nm;render();return;}netStart('guest',code,nm);return;}
+  if(a==='net-leave'){netLeave();return;}
+  if(!NET||NET.role!=='host')return;
+  if(a==='net-cpu+'&&NET.roster.length+NET.cpus<NET_MAX){NET.cpus++;render();netPush(true);return;}
+  if(a==='net-cpu-'&&NET.cpus>0){NET.cpus--;render();netPush(true);return;}
+  if(a==='net-go'){netHostStart();return;}
+  if(a==='net-lobby'){if(G)G.token={};G=null;NET.seats=null;NET.view=null;render();netPush(true);return;}
+}
+let rbReturn=null;
+function openRules(from){RB_OPEN=true;rbReturn=from;document.getElementById('rulebook').hidden=false;document.getElementById('rb-scrim').hidden=false;document.getElementById('rb-close').focus();}
+function closeRules(){RB_OPEN=false;document.getElementById('rulebook').hidden=true;document.getElementById('rb-scrim').hidden=true;const b=document.querySelector('[data-act="rules"]');(b||rbReturn)?.focus?.();}
+if(typeof document!=='undefined'){
+document.querySelector('.rb-toc').addEventListener('click',ev=>{const a=ev.target.closest('a');if(!a)return;ev.preventDefault();document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});});
+const NOHOVER=matchMedia('(hover: none)').matches;
+document.addEventListener('mouseover',ev=>{if(NOHOVER)return;const el=ev.target.closest('[data-tip]');if(el)showTip(el);else hideTip();});
+document.addEventListener('focusin',ev=>{if(NOHOVER)return;const el=ev.target.closest('[data-tip]');if(el)showTip(el);else hideTip();});
+document.addEventListener('click',ev=>{if(!NOHOVER)return;const el=ev.target.closest('[data-tip]');if(el&&!ev.target.closest('button'))showTip(el);else hideTip();},true);
+document.addEventListener('scroll',hideTip,true);
+document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='net-code'){ev.preventDefault();netUi('net-join');return;}if(ev.key==='Enter'&&ev.target.id==='net-name'){ev.preventDefault();netUi('net-create');return;}if(ev.key==='Escape'&&RB_OPEN){closeRules();return;}if((ev.key==='Enter'||ev.key===' ')&&ev.target.matches('[data-act][tabindex]')){ev.preventDefault();ev.target.click();}});
+document.addEventListener('click',ev=>{
+  const t=ev.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
+  if(a==='sound'){SOUND=!SOUND;try{localStorage.setItem('golem-sound',SOUND?'on':'off');}catch(e){}if(SOUND)sfx('tap');render();return;}
+  if(t.disabled)return;
+  sfx(a==='dish'?'pick':a==='sel'?'sel':a==='build'?'build':'tap');
+  if(a==='rules'){openRules(t);return;}
+  if(a==='rules-close'){closeRules();return;}
+  if(a==='pick-cpu'){SETUP_STEP='cpu';render();return;}
+  if(a==='pick-back'){SETUP_STEP='mode';render();return;}
+  if(a==='start'){SETUP_STEP='mode';newGame(+t.dataset.n);return;}
+  if(a.startsWith('net-')){netUi(a,t);return;}
+  if(a==='quit'){if(NET){netLeave();return;}if(!G)return;G.token={};G=null;render();return;}
+  if(!G)return;
+  if(a==='close'){G.over.closed=true;render();return;}
+  if(GAME_ACTS.includes(a)){const d={i:t.dataset.i,e:t.dataset.e,uid:t.dataset.uid};
+    if(NET&&NET.role==='guest'){if(a==='build'||a==='end')G.sel.clear();netSend({t:'act',a,d});return;}
+    const p=me();if(p)handleAct(a,d,p);}
+});
+{const rc=store.sget('golem-room');if(rc&&/^[A-Z0-9]{4}$/.test(rc))netStart('guest',rc,store.get('golem-name',''));else render();}
+}
+if(typeof module!=='undefined')module.exports={newGame,get G(){return G},DEFS};
+</script>
