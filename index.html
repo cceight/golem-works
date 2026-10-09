@@ -189,6 +189,8 @@ svg.dishes{width:100%;height:auto;display:block}
 .modes.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .modes.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:480px){.modes.three{grid-template-columns:1fr}}
+a.btn.tw{text-decoration:none;display:inline-flex;align-items:center;background:#1d9bf0;border-color:#1d9bf0;color:#fff}
+a.btn.tw:hover{filter:brightness(1.1)}
 .net{display:flex;flex-direction:column;gap:12px;max-width:520px}
 .net label{display:flex;flex-direction:column;gap:6px;font-weight:700}
 .net input{font:inherit;font-size:18px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
@@ -1130,12 +1132,21 @@ function render(){
   if(!G.fxPrev){G.fxPrev={};G.players.forEach(q=>G.fxPrev[q.i]=Object.assign({},q.res));G.fxq=[];}
   else requestAnimationFrame(playFx);
 }
+// ループ完成をTwitterに投稿する文面
+const GAME_URL='https://cceight.github.io/golem-works/';
+function shareURL(o){
+  const p=o.p,mode=G.solo?'ソロ':G.online?'オンライン対戦':'CPU戦';
+  const named=p.tab.filter(c=>!c.starter).length;
+  const text=`無限ゴーレム工房（${mode}）で、${o.round}ラウンド目に無限ループを完成させた！\n量産ゴーレム100億体、ネームドゴーレム${named}体の工房です。`;
+  return 'https://twitter.com/intent/tweet?'+new URLSearchParams({text,url:GAME_URL,hashtags:'UnlimitedGolem'}).toString();
+}
 function overHTML(){
   const o=G.over;let body='';
   if(o.type==='loop'){const you=o.p===me();body=`<p class="win">${you?'無限ループ完成':esc(o.p.name)+'の勝利'}</p><p>${esc(o.p.name)}が${o.round}ラウンド目に無限ループを証明し、量産ゴーレム100億体に到達しました。${G.solo?`ソロの記録は${o.round}ラウンドです。`:''}</p>`;}
   else{body=`<p class="win">${o.ws.some(w=>w===me())?'あなたの勝利':esc(o.ws.map(w=>w.name).join('と'))+'の勝利'}</p><p>12ラウンドが終わりました。量産ゴーレム、素材の合計、工房のネームドゴーレム数の順で比べています。</p>
     <div class="rank">${o.rk.map((q,i)=>`<div><b>${i+1}</b><span style="color:${pc(q.i)};font-weight:700">${esc(q.name)}</span><span>量産 <b>${q.golems}</b>・素材 <b>${tot(q.res)}</b>・工房 <b>${q.tab.length}</b></span></div>`).join('')}</div>`;}
-  return `<div class="overlay"><div class="dlg" role="dialog" aria-modal="true">${body}<div class="bar"><button class="btn" data-act="close">盤面を見る</button>${!NET?'<button class="btn primary" data-act="quit">もう一度遊ぶ</button>':NET.role==='host'?'<button class="btn primary" data-act="net-lobby">部屋に戻る</button>':'<button class="btn" data-act="quit">部屋を出る</button>'}</div></div></div>`;
+  const tw=o.type==='loop'&&o.p===me()?`<a class="btn tw" href="${shareURL(o)}" target="_blank" rel="noopener">Twitterに投稿</a>`:'';
+  return `<div class="overlay"><div class="dlg" role="dialog" aria-modal="true">${body}<div class="bar">${tw}<button class="btn" data-act="close">盤面を見る</button>${!NET?'<button class="btn primary" data-act="quit">もう一度遊ぶ</button>':NET.role==='host'?'<button class="btn primary" data-act="net-lobby">部屋に戻る</button>':'<button class="btn" data-act="quit">部屋を出る</button>'}</div></div></div>`;
 }
 let SETUP_STEP='mode';
 function setupHTML(){
