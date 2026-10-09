@@ -191,6 +191,7 @@ svg.dishes{width:100%;height:auto;display:block}
 @media (max-width:480px){.modes.three{grid-template-columns:1fr}}
 a.btn.tw{text-decoration:none;display:inline-flex;align-items:center;background:#1d9bf0;border-color:#1d9bf0;color:#fff}
 a.btn.tw:hover{filter:brightness(1.1)}
+.rot{width:1.1em;height:1.1em;vertical-align:-.2em;margin-right:.08em;color:var(--brass)}
 .net{display:flex;flex-direction:column;gap:12px;max-width:520px}
 .net label{display:flex;flex-direction:column;gap:6px;font-weight:700}
 .net input{font:inherit;font-size:18px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
@@ -442,7 +443,7 @@ body{
     <section id="rb-named"><h3>ネームドゴーレムの基本ルール</h3>
       <ul><li>属性はコストの属性で決まる。コストの「無」はどの素材で払ってもよく、無だけのカードは無色。効果は特に書かれていないかぎり何度でも発動する。</li>
         <li>同名のネームドゴーレムは、工房に1枚までしか置けない。</li>
-        <li>【横向き】の効果は、カードが縦向きのときだけ使える。使ったら横向きにし、自分のターン終了時に縦向きに戻す。</li>
+        <li><svg class="rot" viewBox="0 0 16 16" role="img" aria-label="回転マーク"><g transform="matrix(-1 0 0 1 16 0)"><path d="M3.2 9.5A5 5 0 1 0 5.3 4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M2.6 1.6v3.7h3.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></g></svg>（回転マーク）のついた効果は、カードが縦向きのときだけ使える。使うときはカードを横向きに倒し、自分のターン終了時に縦向きに戻す。</li>
         <li>ネームドゴーレムの効果で得る素材は皿から減らさず、共通の置き場から得る。皿が減るのは素材ドラフトで取ったときだけ。</li>
         <li>効果で素材を得るときは、受け取らないことも選べる。画面では、ラウンド開始からドラフト終了までに、受け取ると残りのドラフトで溢れそうなときだけ確認が出る。</li>
         <li>単体で素材が増える変換はない。素材の増加は、必ず複数のカードの組み合わせから生まれる。</li></ul>
@@ -501,7 +502,7 @@ d('鉱脈ゴーレム','金2','conv',{f:'土',t:'金'},4,'変換','土1→金1')
 d('結露ゴーレム','水2','conv',{f:'金',t:'水'},4,'変換','金1→水1');
 d('水車ゴーレム','木2','conv',{f:'水',t:'木'},4,'変換','水1→木1');
 [['樹人工房','木'],['炎像工房','火'],['陶工ゴーレム','土'],['鋳造ゴーレム','金'],['氷像工房','水']].forEach(([n,e])=>d(n,e+'2','prod',{pay:{[e]:2}},3,'生産',`${e}2を払い、量産ゴーレム+1`));
-[['苗木','木'],['種火','火'],['粘土','土'],['砂鉄','金'],['湧水','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','pick_lo',{e},3,'取得誘発',`【横向き】ドラフトで${e}を取ったとき、さらに${e}1を得る`));
+[['苗木','木'],['種火','火'],['粘土','土'],['砂鉄','金'],['湧水','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','pick_lo',{e},3,'取得誘発',`ドラフトで${e}を取ったとき、↻カードを横向きに倒して、さらに${e}1を得る`));
 [['芽吹き','木'],['炉心','火'],['番人','土'],['鉄鳴り','金'],['産声','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'6','inc',{e},3,'増加誘発',`量産ゴーレムが増えるたび、${e}1を得る`));
 [['焚火工房','木'],['窯元ゴーレム','火'],['鍛造ゴーレム','土'],['錬水ゴーレム','金'],['苔むし工房','水']].forEach(([n,e])=>d(n,e+'3','prod',{pay:{[e]:1,[nx(e)]:1,any:1}},2,'生産(混成)',`${e}1と${nx(e)}1と好きな素材1を払い、量産ゴーレム+1`));
 [['根張り','木'],['溶鉱','火'],['堤','土'],['伐採','金'],['沸騰','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','conv2',{f:e,t:nx(nx(e))},2,'変換(相剋)',`${e}2→${nx(nx(e))}1`));
@@ -511,7 +512,7 @@ d('写本ゴーレム','水5','copy',{},2,'ドロー','水を得るたび、1枚
 d('号令ゴーレム','金4','order',{},2,'ドロー','量産ゴーレムが増えるたび、1枚ドロー');
 [['木簡','木'],['灯火','火'],['粘土板','土'],['銘板','金'],['墨池','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','rburn',{e},2,'素材燃焼',`${e}1を支払って、1枚ドロー（何度でも）`));
 d('写字生ゴーレム','金2水2','rburn_any',{},2,'素材燃焼','好きな素材2を支払って、1枚ドロー（何度でも）');
-d('廃棄炉ゴーレム','土3','reset',{},2,'手札リセット','【横向き】手札をすべて捨て、同じ枚数ドロー');
+d('廃棄炉ゴーレム','土3','reset',{},2,'手札リセット','↻カードを横向きに倒して、手札をすべて捨て、同じ枚数ドロー');
 d('倉庫ゴーレム','土2','cap',{v:2},3,'強化','素材所持上限+2');
 d('大蔵ゴーレム','金5','cap',{v:4},2,'強化','素材所持上限+4');
 d('書庫ゴーレム','水2','hcap',{v:2},2,'強化','手札上限+2');
@@ -532,19 +533,19 @@ d('互助ゴーレム','土5','mutual',{},1,'共有','他人がネームドゴ�
 d('灯台ゴーレム','木3','beacon',{},1,'共有','ラウンド開始時、全員好きな素材1。自分はさらに1');
 // 軽量カード
 d('若芽ゴーレム','木1','sprout',{},2,'軽量','ラウンド開始時、手札が4枚以下なら追加で1枚ドロー');
-d('火花ゴーレム','火1','loot',{},2,'軽量','【横向き】手札1枚を捨てて1枚ドロー');
+d('火花ゴーレム','火1','loot',{},2,'軽量','↻カードを横向きに倒して、手札1枚を捨てて1枚ドロー');
 d('土塊ゴーレム','土1','clod',{},2,'軽量','素材所持上限+1。作ったとき土1を得る');
 d('鉄片ゴーレム','金1','dig',{},2,'軽量','作ったとき、山札の上3枚から1枚を手札に加え、残りは捨て札に');
-d('水滴ゴーレム','水1','dew',{},2,'軽量','【横向き】素材1を、相生の次の素材に変える');
+d('水滴ゴーレム','水1','dew',{},2,'軽量','↻カードを横向きに倒して、素材1を相生の次の素材に変える');
 d('物見ゴーレム','無1','scout',{},2,'軽量','手札上限+1。作ったとき1枚ドロー');
 d('運び屋ゴーレム','無2','porter',{},2,'軽量','素材所持上限+1。作ったとき1枚ドロー');
-d('種まきゴーレム','無2','seeder',{},2,'軽量','【横向き】木1を得る');
-d('収穫ゴーレム','木1無1','reaper',{},2,'軽量','【横向き】好きな素材1を得る');
+d('種まきゴーレム','無2','seeder',{},2,'軽量','↻カードを横向きに倒して、木1を得る');
+d('収穫ゴーレム','木1無1','reaper',{},2,'軽量','↻カードを横向きに倒して、好きな素材1を得る');
 d('小窯ゴーレム','土1無1','prod',{pay:{土:1,any:2}},2,'軽量','土1と好きな素材2を払い、量産ゴーレム+1');
-d('継ぎ手ゴーレム','金1無1','joint',{},2,'軽量','【横向き】素材1を好きな素材1と入れ替える');
+d('継ぎ手ゴーレム','金1無1','joint',{},2,'軽量','↻カードを横向きに倒して、素材1を好きな素材1と入れ替える');
 d('鋳潰しゴーレム','火2','melt',{},2,'再利用','自分の工房のネームドゴーレム1枚を捨て札にして、その属性の素材1を得る（何度でも・初期カードは対象外）');
-[['森','木'],['焔','火'],['岳','土'],['鉱','金'],['淵','水']].forEach(([n,e])=>d(n+'の長ゴーレム',e+'3','chief',{e},2,'長',`【横向き】自分の工房の${e}のネームドゴーレム2枚につき、${e}1を得る`));
-d('鶏鳴ゴーレム','火1水1無1','rooster',{},2,'起こし','【横向き】手札1枚を捨てて、工房の別のネームドゴーレム1枚を縦向きに戻す');
+[['森','木'],['焔','火'],['岳','土'],['鉱','金'],['淵','水']].forEach(([n,e])=>d(n+'の長ゴーレム',e+'3','chief',{e},2,'長',`↻カードを横向きに倒して、自分の工房の${e}のネームドゴーレム2枚につき、${e}1を得る`));
+d('鶏鳴ゴーレム','火1水1無1','rooster',{},2,'起こし','↻カードを横向きに倒して、手札1枚を捨てて、工房の別のネームドゴーレム1枚を縦向きに戻す');
 d('暁鐘ゴーレム','木2火1土1金1水1','bell',{},1,'起こし','手札2枚を捨てて、工房の別のネームドゴーレム1枚を縦向きに戻す（何度でも）');
 DEFS.forEach(x=>{x.els=Object.keys(x.cost).filter(k=>k!=='any');x.text=x.text.replace(/を得る(?!たび)/g,'を得ることができる');});
 const STARTERS=[
@@ -994,6 +995,9 @@ async function run(){
   render();
 }
 // ---- 画面 ----
+const ROT_SVG='<svg class="rot" viewBox="0 0 16 16" role="img" aria-label="回転マーク"><g transform="matrix(-1 0 0 1 16 0)"><path d="M3.2 9.5A5 5 0 1 0 5.3 4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M2.6 1.6v3.7h3.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></g></svg>';
+const txt=t=>esc(t).replace(/↻/g,ROT_SVG);
+const plain=t=>esc(String(t).replace(/↻/g,''));
 const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 const me=()=>G?(NET&&NET.view!=null?G.players[NET.view]:G.players.find(p=>!p.cpu)):null;
 // 表示用の量産数（歩いている子が着くまで増やさない）
@@ -1048,14 +1052,14 @@ function cardHTML(c,where,p){
   const tact=where==='tab'?tabActs(p,c):'';
   const ready=myTurn()&&(can||(tact&&!tact.includes('disabled')&&c.k!=='scrap'));
   const acts=`${where==='hand'&&myTurn()?`<button class="btn small" data-act="build" data-uid="${c.uid}" ${can?'':'disabled'}>作る</button>`:''}${tact}`;
-  const inner=`<div class="${cls}${ready?' ready':''}" data-tip="${c.uid}" ${where==='hand'?`tabindex="0" aria-label="${esc(c.name)}：${esc(c.text)}"`:`tabindex="0" aria-label="${esc(c.name)}：${esc(c.text)}"`} style="--c:${artColor(c)}">${band(c)}<div class="costrow">${costDots(c.cost)}</div><div class="art" aria-hidden="true">ILLUST</div><div class="bd">
-    <div class="nm">${esc(c.name)}</div><div class="tx">${esc(c.text)}</div>${acts?`<div class="acts">${acts}</div>`:''}</div></div>`;
+  const inner=`<div class="${cls}${ready?' ready':''}" data-tip="${c.uid}" ${where==='hand'?`tabindex="0" aria-label="${esc(c.name)}：${plain(c.text)}"`:`tabindex="0" aria-label="${esc(c.name)}：${plain(c.text)}"`} style="--c:${artColor(c)}">${band(c)}<div class="costrow">${costDots(c.cost)}</div><div class="art" aria-hidden="true">ILLUST</div><div class="bd">
+    <div class="nm">${esc(c.name)}</div><div class="tx">${txt(c.text)}</div>${acts?`<div class="acts">${acts}</div>`:''}</div></div>`;
   return where==='tab'?`<div class="slot ${c.tapped?'tapped':''}">${inner}</div>`:inner;
 }
 function findCard(uid){for(const q of G.players){const c=q.hand.find(x=>x.uid===uid)||q.tab.find(x=>x.uid===uid);if(c)return {c,q};}return null;}
 function tipHTML(c,q){
   const dup=!c.starter&&q===me()&&q.hand.includes(c)&&q.tab.some(x=>x.name===c.name);
-  return `${band(c)}<div class="in"><div class="cost">${costHTML(c.cost)}</div><div class="nm">${esc(c.name)}</div><div class="role">${esc(c.role)}${c.tapped?'・横向き（使用済み）':''}</div><div class="tx">${esc(c.text)}</div>${dup?'<div class="note">工房に同名のネームドゴーレムがいるため作れません</div>':''}</div>`;
+  return `${band(c)}<div class="in"><div class="cost">${costHTML(c.cost)}</div><div class="nm">${esc(c.name)}</div><div class="role">${esc(c.role)}${c.tapped?'・横向き（使用済み）':''}</div><div class="tx">${txt(c.text)}</div>${dup?'<div class="note">工房に同名のネームドゴーレムがいるため作れません</div>':''}</div>`;
 }
 function dishSVG(){
   const P={木:[150,48],火:[246,118],土:[209,230],金:[91,230],水:[54,118]};
