@@ -1,4 +1,8 @@
-<title>無限ゴーレム工房</title>
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UNLIMITED GOLEM WORKS｜無限ゴーレム工房</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -25,7 +29,7 @@ button{font:inherit;color:inherit}
 button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .app{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 header.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding-block:6px}
-.brand{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:.04em;margin:0}
+.brand{font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:.04em;margin:0}
 .brand small{display:block;font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:.18em;color:var(--muted)}
 .meter{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:12.5px;white-space:nowrap}
@@ -53,7 +57,7 @@ svg.dishes{max-width:200px;margin:0 auto;transition:max-width .25s ease}
 @media (max-width:1100px){.grid,.grid.draft,.grid.play{grid-template-columns:minmax(0,1fr) 250px}}
 @media (max-width:760px){.grid,.grid.draft,.grid.play{grid-template-columns:minmax(0,1fr)}.rightband{position:static;max-height:none;overflow:visible}.leftcol{order:3}.logcol{order:2}svg.dishes,.grid.draft svg.dishes{max-width:220px}}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;min-width:0}
-.panel h2{font-family:var(--display);font-size:15px;font-weight:700;margin:0 0 8px;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.panel h2{font-family:var(--display);font-size:15px;font-weight:400;margin:0 0 8px;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
 .panel h2 .sub{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:0}
 .col{display:flex;flex-direction:column;gap:14px;min-width:0}
 .banner{border-radius:var(--r);padding:10px 14px;background:var(--sunk);border:1px dashed var(--accent);font-weight:500}
@@ -112,7 +116,7 @@ svg.dishes{width:100%;height:auto;display:block}
 .detail .empty{padding:10px}
 .detail .band{height:6px}
 .detail .in{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
-.detail .nm{font-family:var(--display);font-weight:700;font-size:16px}
+.detail .nm{font-family:var(--body);font-weight:700;font-size:16px}
 .detail .role{font-size:11px;letter-spacing:.08em;color:var(--muted)}
 .detail .tx{font-size:13.5px;line-height:1.6}
 .detail .note{font-size:12px;color:var(--warn)}
@@ -136,7 +140,7 @@ svg.dishes{width:100%;height:auto;display:block}
 .pickcard .band,.tip .band,.detail .band{height:6px;background:var(--c)}
 .pickcard .band.multi,.tip .band.multi{background-color:transparent}
 .pickcard .in{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
-.pickcard .nm{font-family:var(--display);font-weight:700;font-size:15px}
+.pickcard .nm{font-family:var(--body);font-weight:700;font-size:15px}
 .pickcard .role{font-size:11px;letter-spacing:.08em;color:var(--muted)}
 .pickcard .tx{font-size:13px;line-height:1.55}
 .pickcard .cost{display:flex;gap:4px;flex-wrap:wrap}
@@ -148,7 +152,7 @@ svg.dishes{width:100%;height:auto;display:block}
 .tip{position:fixed;z-index:30;width:250px;max-width:calc(100vw - 32px);background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);overflow:hidden;pointer-events:none}
 .tip .band{height:6px}
 .tip .in{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
-.tip .nm{font-family:var(--display);font-weight:700;font-size:15px}
+.tip .nm{font-family:var(--body);font-weight:700;font-size:15px}
 .tip .role{font-size:11px;letter-spacing:.08em;color:var(--muted)}
 .tip .tx{font-size:13px;line-height:1.55}
 .tip .note{font-size:11.5px;color:var(--warn)}
@@ -162,7 +166,7 @@ svg.dishes{width:100%;height:auto;display:block}
 .instr.mine b{color:var(--accent)}
 @keyframes instr-blink{from{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}to{border-color:color-mix(in srgb,var(--accent) 25%,var(--line));box-shadow:0 0 0 0 transparent}}
 @media (prefers-reduced-motion:reduce){.instr.mine{animation:none}}
-.card .nm{font-family:var(--display);font-weight:700;font-size:11.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .nm{font-family:var(--body);font-weight:700;font-size:12px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card .role{font-size:10.5px;letter-spacing:.08em;color:var(--muted)}
 .card .tx{font-size:var(--tx);line-height:1.45;flex:1;min-height:0;overflow:auto}
 .card .cost{display:flex;gap:4px;flex-wrap:wrap}
@@ -176,10 +180,10 @@ svg.dishes{width:100%;height:auto;display:block}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .log{max-height:640px;overflow:auto;display:flex;flex-direction:column;gap:3px;font-size:12.5px}
 .log .ln{padding:2px 0;border-bottom:1px dotted var(--line)}
-.log .ln.round{font-family:var(--display);font-weight:700;color:var(--accent);padding-top:8px}
+.log .ln.round{font-family:var(--body);font-weight:700;color:var(--accent);padding-top:8px}
 .log .ln.big{font-weight:700;color:var(--warn)}
 .setup{max-width:760px;margin:30px auto;display:flex;flex-direction:column;gap:16px}
-.setup h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,6vw,48px);margin:0;letter-spacing:.05em;text-wrap:balance}
+.setup h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,6vw,48px);margin:0;letter-spacing:.05em;text-wrap:balance}
 .setup h1 small{display:block;font-family:var(--body);font-weight:500;font-size:13px;letter-spacing:.32em;color:var(--muted);margin-top:4px}
 .setup .ask{font-weight:700}
 .modes.two{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -209,13 +213,13 @@ svg.dishes{width:100%;height:auto;display:block}
 .mode span{font-size:12px;color:var(--muted)}
 .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
 .rules div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12.5px}
-.rules b{display:block;font-family:var(--display);font-size:13.5px;margin-bottom:2px}
+.rules b{display:block;font-family:var(--body);font-weight:700;font-size:13.5px;margin-bottom:2px}
 .overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--ground) 70%,transparent);display:grid;place-items:center;padding:16px;z-index:10;backdrop-filter:blur(3px)}
 .dlg{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 40px rgba(0,0,0,.18)}
 .dlg h3{margin:0;font-family:var(--display);font-size:18px}
 .dlg .opts{display:flex;flex-wrap:wrap;gap:8px}
 .dlg .opts button{font-size:16px;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;border:1.5px solid var(--c);color:var(--c);background:color-mix(in srgb,var(--c) 10%,transparent)}
-.win{font-family:var(--display);font-weight:800;font-size:clamp(30px,7vw,52px);line-height:1.1;margin:0;color:var(--accent)}
+.win{font-family:var(--display);font-weight:400;font-size:clamp(30px,7vw,52px);line-height:1.1;margin:0;color:var(--accent)}
 .rank{display:flex;flex-direction:column;gap:4px;font-size:13px}
 .rank div{display:flex;gap:8px}
 .rank b{font-family:var(--mono)}
@@ -263,7 +267,7 @@ body{
   box-shadow:inset 0 1px 0 rgba(255,220,170,.06),0 6px 18px rgba(0,0,0,.35);
 }
 .pl,.tip,.mode,.rules div{background-image:linear-gradient(180deg,#2a2119,#1d1712)}
-.panel h2,.dlg h3,.rb-head h2,.rb-body h3{font-family:var(--display);font-weight:400;color:var(--brass);letter-spacing:.08em;text-shadow:0 1px 0 #000,0 0 10px rgba(214,160,74,.18)}
+.panel h2,.dlg h3,.rb-head h2,.rb-body h3{font-family:var(--body);font-weight:700;color:var(--brass);letter-spacing:.08em;text-shadow:0 1px 0 #000,0 0 10px rgba(214,160,74,.18)}
 .panel h2 .sub{color:var(--muted);text-shadow:none}
 .brand{font-family:var(--display);font-weight:400;color:var(--brass);letter-spacing:.08em;text-shadow:0 2px 0 #000,0 0 18px rgba(214,160,74,.25)}
 .brand small{color:var(--muted);letter-spacing:.3em}
@@ -275,7 +279,7 @@ body{
 .btn.primary{background:linear-gradient(180deg,#f0c36b,#c08a35 55%,#8c6127);color:var(--accent-ink);border-color:#f3cf86;text-shadow:0 1px 0 rgba(255,240,200,.5);font-weight:700}
 .btn.primary:hover:not(:disabled){color:#120b04;filter:brightness(1.06)}
 .instr{background:linear-gradient(180deg,#3a2c1d,#241b13);border:2px solid var(--brass-dk);box-shadow:inset 0 1px 0 rgba(255,220,170,.12),0 6px 20px rgba(0,0,0,.45)}
-.instr b{color:var(--ink);font-family:var(--display);font-weight:400;letter-spacing:.06em}
+.instr b{color:var(--ink);font-family:var(--body);font-weight:700;letter-spacing:.06em}
 .instr .instr-text{position:relative;padding-left:22px}
 .instr .instr-text::before{content:"";position:absolute;left:0;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#5b4a37;box-shadow:inset 0 -2px 3px rgba(0,0,0,.6)}
 .instr.mine{border-color:var(--brass)}
@@ -308,14 +312,14 @@ body{
 .pl{background-image:linear-gradient(180deg,#261e17,#1b1510)}
 .pl.active{border-color:var(--pc);box-shadow:inset 3px 0 0 var(--pc),0 0 12px color-mix(in srgb,var(--pc) 25%,transparent)}
 .log .ln{border-bottom-color:#3a2e22}
-.log .ln.round{color:var(--brass);font-family:var(--display);font-weight:400}
+.log .ln.round{color:var(--brass);font-family:var(--body);font-weight:700}
 .fx-dot{box-shadow:0 0 0 2px #1b140e,0 0 12px 2px currentColor}
 .overlay{background:rgba(10,7,4,.62)}
 .dlg{border-color:var(--brass-dk);box-shadow:0 18px 50px rgba(0,0,0,.6)}
 .setup h1{font-family:var(--display);font-weight:400;color:var(--brass);text-shadow:0 3px 0 #000,0 0 30px rgba(214,160,74,.3)}
 .mode{border-color:var(--brass-dk)}
 .mode:hover{border-color:var(--brass);box-shadow:0 0 0 2px rgba(214,160,74,.2)}
-.mode b{font-family:var(--display);font-weight:400;color:var(--brass)}
+.mode b{font-family:var(--body);font-weight:700;color:var(--brass)}
 .win{font-family:var(--display);font-weight:400;color:var(--brass);text-shadow:0 0 20px rgba(214,160,74,.4)}
 .rulebook{border-left-color:var(--brass-dk)}
 .rb-toc a{color:var(--brass);border-color:var(--line)}
@@ -348,8 +352,9 @@ body{
   .instr-acts{margin-left:0;width:100%}
   .instr-acts .btn{flex:1;padding:8px 10px}
   header.top{gap:6px 8px}
-  .brand{font-size:17px}
+  .brand{font-size:clamp(13px,4.2vw,17px);letter-spacing:.03em}
   .brand small{display:none}
+  .card .nm{white-space:normal;overflow:visible}
   .meter{gap:4px}
   .chip{padding:2px 8px;font-size:11px}
   header.top .spacer{display:none}
@@ -412,7 +417,7 @@ body{
       <svg class="rb-fig" viewBox="0 0 300 280" role="img" aria-label="五行の皿の並び。隣の皿へだけ動ける">
         <g stroke="var(--line)" stroke-width="2" stroke-dasharray="4 4"><line x1="150" y1="48" x2="209" y2="230"/><line x1="150" y1="48" x2="91" y2="230"/><line x1="246" y1="118" x2="91" y2="230"/><line x1="246" y1="118" x2="54" y2="118"/><line x1="209" y1="230" x2="54" y2="118"/></g>
         <g stroke="var(--muted)" stroke-width="2"><line x1="180" y1="70" x2="216" y2="96"/><line x1="235" y1="152" x2="221" y2="196"/><line x1="174" y1="230" x2="126" y2="230"/><line x1="80" y1="196" x2="65" y2="152"/><line x1="84" y1="96" x2="120" y2="70"/></g>
-        <g font-size="17" font-weight="700" text-anchor="middle" style="font-family:var(--display)">
+        <g font-size="17" font-weight="700" text-anchor="middle" style="font-family:var(--body)">
           <circle cx="150" cy="48" r="28" fill="var(--panel)" stroke="var(--wood)" stroke-width="2.5"/><text x="150" y="54" fill="var(--wood)">木</text>
           <circle cx="246" cy="118" r="28" fill="var(--panel)" stroke="var(--fire)" stroke-width="2.5"/><text x="246" y="124" fill="var(--fire)">火</text>
           <circle cx="209" cy="230" r="28" fill="var(--panel)" stroke="var(--earth)" stroke-width="2.5"/><text x="209" y="236" fill="var(--earth)">土</text>
@@ -1055,7 +1060,7 @@ function dishSVG(){
   const al=(G.phase==='draft'&&G.cur&&G.cur===me())?G.allowed:[];
   const toks=G.players.map(p=>p.pos?(()=>{const [x,y]=P[p.pos];const a=(p.i/G.n)*Math.PI*2-Math.PI/2;return `<circle cx="${x+Math.cos(a)*42}" cy="${y+Math.sin(a)*42}" r="7" fill="${pc(p.i)}" stroke="var(--panel)" stroke-width="2"><title>${esc(p.name)}</title></circle>`;})():'').join('');
   const lines=E.map(e=>{const [x1,y1]=P[e],[x2,y2]=P[nx(e)];const dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy);return `<line x1="${x1+dx/l*36}" y1="${y1+dy/l*36}" x2="${x2-dx/l*36}" y2="${y2-dy/l*36}" stroke="var(--line)" stroke-width="2"/>`;}).join('');
-  const dishes=E.map(e=>{const [x,y]=P[e];const ok=al.includes(e);return `<g class="dish ${ok?'ok':''}" data-dish="${e}" ${ok?`data-act="dish" data-e="${e}" tabindex="0" role="button" aria-label="${e}の皿から取る"`:''}><circle class="base" cx="${x}" cy="${y}" r="31" fill="color-mix(in srgb,var(--${EK[e]}) ${ok?28:14}%,var(--panel))" stroke="var(--${EK[e]})"/><text x="${x}" y="${y-4}" text-anchor="middle" font-size="17" font-weight="700" fill="var(--${EK[e]})" style="font-family:var(--display)">${e}</text><text x="${x}" y="${y+16}" text-anchor="middle" font-size="14" fill="var(--ink)">${G.dish[e]}</text></g>`;}).join('');
+  const dishes=E.map(e=>{const [x,y]=P[e];const ok=al.includes(e);return `<g class="dish ${ok?'ok':''}" data-dish="${e}" ${ok?`data-act="dish" data-e="${e}" tabindex="0" role="button" aria-label="${e}の皿から取る"`:''}><circle class="base" cx="${x}" cy="${y}" r="31" fill="color-mix(in srgb,var(--${EK[e]}) ${ok?28:14}%,var(--panel))" stroke="var(--${EK[e]})"/><text x="${x}" y="${y-4}" text-anchor="middle" font-size="18" font-weight="700" fill="var(--${EK[e]})" style="font-family:var(--body)">${e}</text><text x="${x}" y="${y+16}" text-anchor="middle" font-size="14" fill="var(--ink)">${G.dish[e]}</text></g>`;}).join('');
   return `<svg class="dishes" viewBox="0 0 300 280" role="img" aria-label="素材皿">${lines}${dishes}${toks}</svg>`;
 }
 function playersHTML(){
@@ -1104,7 +1109,7 @@ function render(){
   app.classList.add('game');
   {const gp=(me()||G.players[0]).golems;G.gearSpin=G.lastGolems!=null&&gp>G.lastGolems?!G.gearSpin:G.gearSpin;G.lastGolems=gp;}
   app.innerHTML=`<div class="instr ${ins.mine?'mine':''}"><div class="instr-text" role="status" aria-live="polite"><b>${esc(ins.t)}</b><span>${esc(ins.d)}</span></div><div class="instr-acts">${myTurn()?(G.proof?`<button class="btn" data-act="proof-cancel">証明をやめる</button><button class="btn primary" data-act="proof-done">一周完了</button>`:`<button class="btn" data-act="declare">ループ宣言</button><button class="btn primary" data-act="end">ターン終了</button>`):''}</div></div>
-  <header class="top"><h1 class="brand">無限ゴーレム工房<small>UNLIMITED GOLEM WORKS</small></h1>
+  <header class="top"><h1 class="brand">UNLIMITED GOLEM WORKS<small>無限ゴーレム工房</small></h1>
     <div class="meter"><span class="chip">ラウンド <b>${G.round}${G.solo?'':' / 12'}</b></span><span class="chip">山札 <b>${G.deck.length}</b></span><span class="chip">捨て札 <b>${G.disc.length}</b></span><span class="chip">スタート <b>${esc(G.players[G.start].name)}</b></span></div>
     <span class="spacer"></span><button class="btn toggle" data-act="sound" aria-pressed="${SOUND}">効果音 ${SOUND?'オン':'オフ'}</button><button class="btn" data-act="rules">ルール</button><button class="btn" data-act="quit">${NET?'部屋を出る':'<span class="lg">モード選択へ</span>戻る'}</button></header>
   <div class="grid ${G.phase==='draft'||G.phase==='prep'?'draft':G.phase==='turn'?'play':''}">
@@ -1141,7 +1146,7 @@ function setupHTML(){
    :`<p class="ask">CPUの人数を選んでください</p><div class="modes four">
     ${[1,2,3,4].map(n=>`<button class="mode" data-act="start" data-n="${n}"><b>${n}体</b></button>`).join('')}</div>
     <div><button class="btn" data-act="pick-back">戻る</button></div>`;
-  return `<div class="setup"><h1>無限ゴーレム工房<small>UNLIMITED GOLEM WORKS</small></h1>
+  return `<div class="setup"><h1>UNLIMITED GOLEM WORKS<small>無限ゴーレム工房</small></h1>
   <p>ゴーレムがゴーレムを作る工房を組み、最初に無限ループを完成させた人の勝ちです。12ラウンド以内に誰も完成しなければ、量産ゴーレムが一番多い人が勝ちます。</p>
   ${body}
   <div><button class="btn" data-act="rules">ルールブックを読む</button></div></div>`;
@@ -1301,7 +1306,7 @@ function netBar(){
   return '';
 }
 function lobbyHTML(){
-  const head=`<h1>無限ゴーレム工房<small>UNLIMITED GOLEM WORKS ・ オンライン</small></h1>`;
+  const head=`<h1>UNLIMITED GOLEM WORKS<small>無限ゴーレム工房 ・ オンライン</small></h1>`;
   if(NET.stage==='menu'){const nm=esc(NET.name||store.get('golem-name',''));
     return `<div class="setup">${head}
     <div class="net">${NET.err?`<p class="err" role="alert">${esc(NET.err)}</p>`:''}
