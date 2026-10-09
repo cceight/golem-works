@@ -1202,7 +1202,7 @@ const NET_MAX=5;
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}},
   sget(k){try{return sessionStorage.getItem(k);}catch(e){return null;}},sset(k,v){try{sessionStorage.setItem(k,v);}catch(e){}}};
 function netCid(){let c=store.sget('golem-cid');if(!c){c=Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);store.sset('golem-cid',c);}return c;}
-function netNewCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];return c;}
+function netNewCode(){const A='ACDEFHJKLMNPRTWXY3479';let c='';for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];return c;}
 function netSend(m){if(NET&&NET.ws&&NET.ws.readyState===1)NET.ws.send(JSON.stringify(m));}
 function netOpen(code,create){
   const ws=new WebSocket(`${NET_SERVER}/room/${code}?cid=${encodeURIComponent(NET.cid)}&name=${encodeURIComponent(NET.name)}${create?'&create=1':''}`);
