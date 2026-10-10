@@ -482,26 +482,9 @@ body{
         <li><svg class="rot" viewBox="0 0 16 16" role="img" aria-label="回転マーク"><g transform="matrix(-1 0 0 1 16 0)"><path d="M3.2 9.5A5 5 0 1 0 5.3 4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M2.6 1.6v3.7h3.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></g></svg>（回転マーク）のついた効果は、カードが縦向きのときだけ使える。使うときはカードを横向きに倒し、自分のターン終了時に縦向きに戻す。</li>
         <li>ネームドゴーレムの効果で得る素材は皿から減らさず、共通の置き場から得る。皿が減るのは素材ドラフトで取ったときだけ。</li>
         <li>効果で素材を得るときは、受け取らないことも選べる。画面では、ラウンド開始からドラフト終了までに、受け取ると残りのドラフトで溢れそうなときだけ確認が出る。</li>
+        <li>上限を上げるネームドゴーレム（倉庫、大蔵、書庫、土塊、運び屋、物見、師範）は、工房にいる間だけ効く。捨て札にすると上限が下がるので、誰かの素材や自分の手札が新しい上限を超えるなら、捨て札にできない。</li>
         <li>単体で素材が増える変換はない。素材の増加は、必ず複数のカードの組み合わせから生まれる。</li></ul>
-      <div class="rb-tbl"><table><thead><tr><th>役割</th><th>主な効果</th><th>代表例</th></tr></thead><tbody>
-        <tr><td>変換</td><td>相生の順に1対1で変える</td><td>火口ゴーレム：木1→火1</td></tr>
-        <tr><td>変換（相剋）</td><td>ひとつ飛ばしの属性へ2対1で変える</td><td>根張りゴーレム：木2→土1</td></tr>
-        <tr><td>生産</td><td>素材2個で量産ゴーレム+1</td><td>陶工ゴーレム：土2</td></tr>
-        <tr><td>生産（混成）</td><td>隣り合う2属性と好きな素材1で量産ゴーレム+1</td><td>窯元ゴーレム：火1、土1、好きな1</td></tr>
-        <tr><td>増加誘発</td><td>量産ゴーレムが増えるたび素材1を得る</td><td>番人ゴーレム：土1</td></tr>
-        <tr><td>獲得誘発</td><td>特定の素材を得るたび、相生の次の素材1を得る</td><td>慈雨ゴーレム：水→木</td></tr>
-        <tr><td>取得誘発</td><td>ドラフトで取ったとき、同じ素材をもう1個得る</td><td>苗木ゴーレム、大樹ゴーレム</td></tr>
-        <tr><td>ドロー・素材燃焼</td><td>追加のドロー。素材を支払ってドローする</td><td>設計士ゴーレム、墨池ゴーレム</td></tr>
-        <tr><td>強化</td><td>素材所持上限や手札上限を上げる</td><td>倉庫ゴーレム：素材所持上限+2</td></tr>
-        <tr><td>共有</td><td>全員に配りつつ、自分はより多く得る</td><td>恵みの雨ゴーレム：全員水1、自分は水3</td></tr>
-        <tr><td>軽量</td><td>コスト1〜2の序盤向けカード</td><td>物見ゴーレム、収穫ゴーレム</td></tr>
-        <tr><td>解体</td><td>手札2枚を捨てて、捨てたどちらかの属性の素材1を得る。無色のカードは好きな属性として扱う</td><td>分別ゴーレム</td></tr>
-        <tr><td>解体（上位）</td><td>分別ゴーレムの強化版。手札を素材に変える</td><td>原子炉、焼却炉、反射炉、万能炉ゴーレム</td></tr>
-        <tr><td>探索</td><td>山札から特定のカードを探して手札に加える</td><td>炉心ゴーレム</td></tr>
-        <tr><td>長</td><td>同じ属性のネームドゴーレム2枚につき素材1</td><td>森の長ゴーレム</td></tr>
-        <tr><td>再利用・起こし</td><td>工房のゴーレムを素材に戻す、横向きを縦向きに戻す</td><td>鋳潰しゴーレム、鶏鳴ゴーレム、暁鐘ゴーレム</td></tr>
-      </tbody></table></div>
-      <p>ループの基本形は、生産1枚、増加誘発2枚、属性のズレを埋める変換0〜3枚の組み合わせです。</p></section>
+      <p>ループの基本形は、量産ゴーレムを作るカード1枚、量産ゴーレムが増えるたびに素材を得るカード2枚、属性のズレを埋める変換0〜3枚の組み合わせです。</p></section>
     <section id="rb-win"><h3>勝利条件</h3>
       <h4>ループ完成</h4>
       <p>生産から始まる処理を一周回したあと、工房が開始時と同じで、素材が開始時以上に残り、量産ゴーレムが増えていれば、何度でも回せることの証明になります。「100億回繰り返します」と宣言し、量産ゴーレム100億体で即勝利です。</p>
@@ -517,8 +500,8 @@ body{
         <tr><td>素材</td><td>木・火・土・金・水の5種類</td></tr>
         <tr><td>相生</td><td>木→火→土→金→水→木の順。隣り合う皿の関係</td></tr>
         <tr><td>相剋</td><td>ひとつ飛ばしの関係。ドラフトでは動けない</td></tr>
-        <tr><td>ドラフトで取る</td><td>素材ドラフトで皿から1個取ること。取得誘発はこれにだけ反応する</td></tr>
-        <tr><td>得る</td><td>ドラフト、ボーナス、変換、効果など、あらゆる入手。獲得誘発はこちらに反応する</td></tr>
+        <tr><td>ドラフトで取る</td><td>素材ドラフトで皿から1個取ること。「ドラフトで〇を取ったとき」の効果はこれにだけ反応する</td></tr>
+        <tr><td>得る</td><td>ドラフト、ボーナス、変換、効果など、あらゆる入手。「〇を得るたび」の効果はこちらに反応する</td></tr>
       </tbody></table></div></section>
     <section id="rb-cards"><h3>カードリスト</h3><div id="rb-cardlist"></div></section>
   </div>
@@ -540,7 +523,7 @@ d('灰掻きゴーレム','土2','conv',{f:'火',t:'土'},4,'変換','火1→土
 d('鉱脈ゴーレム','金2','conv',{f:'土',t:'金'},4,'変換','土1→金1');
 d('結露ゴーレム','水2','conv',{f:'金',t:'水'},4,'変換','金1→水1');
 d('水車ゴーレム','木2','conv',{f:'水',t:'木'},4,'変換','水1→木1');
-[['樹人工房','木'],['炎像工房','火'],['陶工ゴーレム','土'],['鋳造ゴーレム','金'],['氷像工房','水']].forEach(([n,e])=>d(n,e+'2','prod',{pay:{[e]:2}},3,'生産',`${e}2を払い、量産ゴーレム+1`));
+[['樹人ゴーレム','木'],['炎像ゴーレム','火'],['陶工ゴーレム','土'],['鋳造ゴーレム','金'],['氷像ゴーレム','水']].forEach(([n,e])=>d(n,e+'2','prod',{pay:{[e]:2}},3,'生産',`${e}2を払い、量産ゴーレム+1`));
 [['苗木','木'],['種火','火'],['粘土','土'],['砂鉄','金'],['湧水','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','pick_lo',{e},3,'取得誘発',`ドラフトで${e}を取ったとき、↻カードを横向きに倒して、さらに${e}1を得る`));
 [['芽吹き','木'],['心火','火'],['番人','土'],['鉄鳴り','金'],['産声','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'6','inc',{e},3,'増加誘発',`量産ゴーレムが増えるたび、${e}1を得る`));
 [['焚火工房','木'],['窯元ゴーレム','火'],['鍛造ゴーレム','土'],['錬水ゴーレム','金'],['苔生工房','水']].forEach(([n,e])=>d(n,e+'3','prod',{pay:{[e]:1,[nx(e)]:1,any:1}},2,'生産(混成)',`${e}1と${nx(e)}1と好きな素材1を払い、量産ゴーレム+1`));
@@ -553,9 +536,9 @@ d('号令ゴーレム','金4','order',{},2,'ドロー','量産ゴーレムが増
 [['木簡','木'],['灯火','火'],['粘土板','土'],['銘板','金'],['墨池','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','rburn',{e},2,'素材燃焼',`${e}1を支払って、1枚ドロー（何度でも）`));
 d('写字生ゴーレム','金2水2','rburn_any',{},2,'素材燃焼','好きな素材2を支払って、1枚ドロー（何度でも）');
 d('廃棄炉ゴーレム','土3','reset',{},2,'手札リセット','↻カードを横向きに倒して、手札をすべて捨て、同じ枚数ドロー');
-d('倉庫ゴーレム','土2','cap',{v:2},3,'強化','素材所持上限+2');
-d('大蔵ゴーレム','金5','cap',{v:4},2,'強化','素材所持上限+4');
-d('書庫ゴーレム','水2','hcap',{v:2},2,'強化','手札上限+2');
+d('倉庫ゴーレム','土2','cap',{v:2},3,'強化','工房にいる間、素材所持上限+2');
+d('大蔵ゴーレム','金5','cap',{v:4},2,'強化','工房にいる間、素材所持上限+4');
+d('書庫ゴーレム','水2','hcap',{v:2},2,'強化','工房にいる間、手札上限+2');
 d('祝福ゴーレム','水4','bless',{},2,'作成誘発','ネームドゴーレムを作ったとき、好きな素材1を得る');
 d('見習鍛冶ゴーレム','火2','appr',{},2,'作成誘発','ネームドゴーレムを作ったとき、その属性の素材1を得る');
 d('伝令ゴーレム','水3','herald',{},2,'共有','ラウンド開始時、全員1枚ドロー。自分はさらに1枚');
@@ -569,19 +552,19 @@ d('焼却炉ゴーレム','火2','dis_any',{},3,'解体(上位)','手札2枚を�
 d('万能炉ゴーレム','火2水2金1土1','omni',{},1,'解体(上位)','手札1枚を捨てて、好きな素材1を得る（何度でも）');
 d('反射炉ゴーレム','土2金2','reflect',{},2,'解体(上位)','手札の金か木のカード1枚を捨てて、金か火の素材1を得る（何度でも・無色のカードも捨てられる）');
 d('炉心ゴーレム','火3','tutor',{},2,'探索','このカードを工房から捨て札にして、名前に「炉」の字が入るネームドゴーレム1枚を山札から探して手札に加え、山札を切り直す。山札にいなければ捨て札から探す。どちらにもいなければ1枚ドロー');
-d('渾沌工房','土2水2','prod',{pay:{any:3}},1,'生産','好きな素材3を払い、量産ゴーレム+1');
+d('渾沌ゴーレム','土2水2','prod',{pay:{any:3}},1,'生産','好きな素材3を払い、量産ゴーレム+1');
 d('双子ゴーレム','木3火3','twin',{},1,'増加誘発','量産ゴーレムが増えるたび、木1か火1を得る');
-d('師範ゴーレム','土4','mentor',{},1,'共有','作ったとき、全員の素材所持上限+1。自分はさらに+2');
+d('師範ゴーレム','土4','mentor',{},1,'共有','工房にいる間、全員の素材所持上限+1。自分はさらに+2');
 d('互助ゴーレム','土5','mutual',{},1,'共有','他人がネームドゴーレムを作るたび、その人は1枚ドロー。自分は好きな素材1');
 d('灯台ゴーレム','木3','beacon',{},1,'共有','ラウンド開始時、全員好きな素材1。自分はさらに1');
 // 軽量カード
 d('若芽ゴーレム','木1','sprout',{},2,'軽量','ラウンド開始時、手札が4枚以下なら追加で1枚ドロー');
 d('火花ゴーレム','火1','loot',{},2,'軽量','↻カードを横向きに倒して、手札1枚を捨てて1枚ドロー');
-d('土塊ゴーレム','土1','clod',{},2,'軽量','素材所持上限+1。作ったとき土1を得る');
+d('土塊ゴーレム','土1','clod',{},2,'軽量','工房にいる間、素材所持上限+1。作ったとき土1を得る');
 d('鉄片ゴーレム','金1','dig',{},2,'軽量','作ったとき、山札の上3枚から1枚を手札に加え、残りは捨て札に');
 d('水滴ゴーレム','水1','dew',{},2,'軽量','↻カードを横向きに倒して、素材1を相生の次の素材に変える');
-d('物見ゴーレム','無1','scout',{},2,'軽量','手札上限+1。作ったとき1枚ドロー');
-d('運び屋ゴーレム','無2','porter',{},2,'軽量','素材所持上限+1。作ったとき1枚ドロー');
+d('物見ゴーレム','無1','scout',{},2,'軽量','工房にいる間、手札上限+1。作ったとき1枚ドロー');
+d('運び屋ゴーレム','無2','porter',{},2,'軽量','工房にいる間、素材所持上限+1。作ったとき1枚ドロー');
 d('種まきゴーレム','無2','seeder',{},2,'軽量','↻カードを横向きに倒して、木1を得る');
 d('収穫ゴーレム','木1無1','reaper',{},2,'軽量','↻カードを横向きに倒して、好きな素材1を得る');
 d('小窯ゴーレム','土1無1','prod',{pay:{土:1,any:2}},2,'軽量','土1と好きな素材2を払い、量産ゴーレム+1');
@@ -597,6 +580,17 @@ const STARTERS=[
   {name:'試作工房',cost:{},k:'prod',pay:{any:4},role:'初期',text:'好きな素材4を払い、量産ゴーレム+1'}];
 STARTERS.forEach(x=>{x.els=[];x.starter=true;x.text=x.text.replace(/を得る(?!たび)/g,'を得ることができる');});
 const cardEls=c=>c.els.length?c.els:E;
+// 上限：工房にいる間だけ効く（捨て札にすると下がる）
+const CAP_BONUS={cap:c=>c.v,clod:()=>1,porter:()=>1,mentor:()=>2},HCAP_BONUS={hcap:c=>c.v,scout:()=>1};
+function capOf(p,without){let v=10;for(const c of p.tab){if(c===without)continue;const f=CAP_BONUS[c.k];if(f)v+=f(c);}
+  if(typeof G!=='undefined'&&G&&G.players)for(const q of G.players)for(const c of q.tab)if(c!==without&&c.k==='mentor')v+=1;return v;}
+function hcapOf(p,without){let v=7;for(const c of p.tab){if(c===without)continue;const f=HCAP_BONUS[c.k];if(f)v+=f(c);}return v;}
+function defCaps(p){Object.defineProperty(p,'cap',{get(){return capOf(p);},enumerable:true,configurable:true});Object.defineProperty(p,'hcap',{get(){return hcapOf(p);},enumerable:true,configurable:true});}
+// 工房のカードを捨て札にすると誰かの素材や自分の手札が上限を超えるなら、その理由を返す
+function sacBlock(p,c){
+  if(c.k==='hcap'||c.k==='scout'){if(p.hand.length>hcapOf(p,c))return `${c.name}を捨て札にすると手札が上限を超えるので、捨て札にできません`;}
+  if(CAP_BONUS[c.k]){const over=G.players.filter(q=>tot(q.res)>capOf(q,c));if(over.length)return `${c.name}を捨て札にすると${over.map(q=>q===p?'あなた':q.name).join('と')}の素材が上限を超えるので、捨て札にできません`;}
+  return null;}
 const reflectable=c=>cardEls(c).some(e=>e==='金'||e==='木');
 const furnace=c=>c.name.includes('炉');
 
@@ -610,8 +604,9 @@ function newGame(nCpu,opt={}){
   const deck=[];DEFS.forEach(df=>{for(let i=0;i<df.n;i++)deck.push(Object.assign({},df,{uid:++UID,tapped:false}));});
   shuffle(deck);
   const players=[];for(let i=0;i<n;i++){const res=zero();E.forEach(e=>res[e]=1);
-    const nh=hum?hum.length:1;players.push({i,name:allCpu?`CPU${i+1}`:hum?(i<nh?hum[i]:NAMES[i-nh+1]):NAMES[i],cpu:allCpu||i>=nh,res,cap:10,hcap:7,hand:[],tab:STARTERS.map(s=>Object.assign({},s,{uid:++UID,tapped:false})),golems:0,pos:null});}
+    const nh=hum?hum.length:1;players.push({i,name:allCpu?`CPU${i+1}`:hum?(i<nh?hum[i]:NAMES[i-nh+1]):NAMES[i],cpu:allCpu||i>=nh,res,hand:[],tab:STARTERS.map(s=>Object.assign({},s,{uid:++UID,tapped:false})),golems:0,pos:null});}
   G={token:{},n,solo:n===1,players,deck,disc:[],dish:zero(),round:0,phase:'setup',start:0,cur:null,lap:0,log:[],sel:new Set(),modal:null,busy:false,over:null,chain:0,overflowP:null,allowed:[],fast:!!opt.fast,warn:'',proof:null,window:false,picks:{},fxq:[],fxBuilt:{},fxPrev:null,fxHop:[],gPend:{},online:!!hum,warnI:null};
+  players.forEach(defCaps);
   players.forEach(p=>draw(p,5));
   run();
 }
@@ -854,11 +849,9 @@ async function build(p,c){
 }
 async function onBuilt(p,c){
   const others=G.players.filter(q=>q!==p);FXSRC=c.uid;
-  if(c.k==='cap')p.cap+=c.v;
-  if(c.k==='hcap')p.hcap+=c.v;
-  if(c.k==='clod'){p.cap+=1;G.chain=0;gain(p,'土');}
-  if(c.k==='porter'){p.cap+=1;draw(p,1);}
-  if(c.k==='scout'){p.hcap+=1;draw(p,1);}
+  if(c.k==='clod'){G.chain=0;gain(p,'土');}
+  if(c.k==='porter')draw(p,1);
+  if(c.k==='scout')draw(p,1);
   if(c.k==='dig'){const look=[];for(let i=0;i<3;i++){const x=deckPop();if(x)look.push(x);}
     if(look.length){const v=await chooseOpt(p,'鉄片ゴーレム：山札の上3枚から、手札に加える1枚を選んでください（残りは捨て札）',look.map(x=>({v:x.uid,label:x.name,el:x.els[0],card:x})),opts=>{const best=look.slice().sort((a,b)=>value(p,b)-value(p,a))[0];return best.uid;});
       const pick=look.find(x=>x.uid===v);look.forEach(x=>{if(x===pick&&p.hand.length<p.hcap)p.hand.push(x);else G.disc.push(x);});}}
@@ -869,11 +862,11 @@ async function onBuilt(p,c){
   if(c.k==='rain'){others.forEach(q=>{G.chain=0;gain(q,'水');});for(let i=0;i<3;i++){G.chain=0;gain(p,'水');}}
   if(c.k==='harvest'){for(const q of others)await gainAny(q,`${p.name}の豊穣祭`);await gainAny(p,'豊穣祭',2);draw(p,1);}
   if(c.k==='bonfire'){others.forEach(q=>draw(q,1));draw(p,3);}
-  if(c.k==='mentor'){others.forEach(q=>q.cap+=1);p.cap+=3;}
   for(const q of others)for(const m of has(q,'mutual')){FXSRC=m.uid;draw(p,1);await gainAny(q,`${p.name}の建設に互助`);}
   FXSRC=null;
 }
 async function tutor(p,c){
+  {const why=sacBlock(p,c);if(why){G.warn=why;return;}}
   p.tab.splice(p.tab.indexOf(c),1);G.disc.push(c);FXSRC=null;
   const pick=async(pool,where)=>{const cands=pool.filter(x=>furnace(x)&&x!==c);if(!cands.length)return null;
     const names=[...new Set(cands.map(x=>x.name))];
@@ -991,7 +984,7 @@ async function cpuTurn(p){
     if(t&&junk&&value(p,junk)<3){p.hand.splice(p.hand.indexOf(junk),1);G.disc.push(junk);t.tapped=false;r.tapped=true;log(`${p.name}の鶏鳴ゴーレムが${t.name}を起こした`);await cpuTapGains(p);}}
   for(const c of has(p,'loot')){if(c.tapped||!p.hand.length)continue;const junk=p.hand.slice().sort((a,b)=>value(p,a)-value(p,b))[0];if(value(p,junk)<3){p.hand.splice(p.hand.indexOf(junk),1);G.disc.push(junk);draw(p,1);c.tapped=true;}}
   if(has(p,'melt').length&&G.round>=4){const dd=desire(p);const junk=p.tab.filter(x=>!x.starter&&['sprout','scout','porter','clod','dig','loot','pick_lo','draw_round','appr'].includes(x.k));
-    for(const x of junk.slice(0,2)){const e=cardEls(x).slice().sort((a,b)=>dd[b]-dd[a])[0];if(dd[e]>0){p.tab.splice(p.tab.indexOf(x),1);G.disc.push(x);G.chain=0;gain(p,e);log(`${p.name}が${x.name}を鋳潰して${e}を得た`);}}}
+    for(const x of junk.filter(x=>!sacBlock(p,x)).slice(0,2)){const e=cardEls(x).slice().sort((a,b)=>dd[b]-dd[a])[0];if(dd[e]>0){p.tab.splice(p.tab.indexOf(x),1);G.disc.push(x);G.chain=0;gain(p,e);log(`${p.name}が${x.name}を鋳潰して${e}を得た`);}}}
   const buildPass=async()=>{for(let it=0;it<8;it++){
     const cand=p.hand.slice().sort((a,b)=>value(p,b)-value(p,a));const top=cand[0];let built=false;
     for(const c of cand){
@@ -1058,7 +1051,7 @@ async function run(){
   render();
 }
 // ---- 画面 ----
-const FLAVOR={"解体ゴーレム": "「やろう。ぶっ壊してやる。」「きゃあ。ゴーレム壊し。」", "廃材ゴーレム": "廃棄された素材を、退勤後に嬉しそうに持って帰るゴーレムがいる。", "試作工房": "一体目は、いつも少し左に傾いて立つ。", "火口ゴーレム": "薪をくべる手つきだけは、どの職人より丁寧だ。", "灰掻きゴーレム": "今日は燃えカス。明日には、地面。", "鉱脈ゴーレム": "掘った土をじっと見つめ、光るものだけを拾う。", "結露ゴーレム": "冷えた鉄の肌に、朝だけ小さな湖ができる。", "水車ゴーレム": "回る。回る。川があるかぎり、回る。", "樹人工房": "枝を一本植えると、一晩で歩く者が生える。", "炎像工房": "「熱いうちに抱きしめな。そしたら懐くから」——炎像工房の親方", "陶工ゴーレム": "ろくろの上で、弟や妹がくるくる生まれる。", "鋳造ゴーレム": "流して、冷まして、叩き出す。それが家族の作り方。", "氷像工房": "溶けないうちに名前をつけるのが、この工房の決まり。", "苗木ゴーレム": "「もう一本だけ、もらってもいい？」", "種火ゴーレム": "小さな火は、拾われるのを待っている。", "粘土ゴーレム": "こねる手が止まらない。止める気もない。", "砂鉄ゴーレム": "磁石の腕を振ると、皿の底から黒い砂がついてくる。", "湧水ゴーレム": "汲めば汲むほど、足元から湧いてくる。", "芽吹きゴーレム": "仲間が生まれるたび、頭の葉が一枚増える。", "番人ゴーレム": "「よし、一体。……よし、もう一体。」", "鉄鳴りゴーレム": "新入りが立ち上がるたび、祝いの鐘の代わりに体を打ち鳴らす。", "産声ゴーレム": "生まれた子の最初の涙を、そっと瓶に集めている。", "焚火工房": "火を囲んでいると、いつのまにか誰かがひとり増えている。", "窯元ゴーレム": "「土と火があれば十分。足りない分は気合いで埋める」", "鍛造ゴーレム": "鍛てば響く。響けば生まれる。生まれれば鍛つ。", "錬水ゴーレム": "銀の器に水を張り、映った影を引きずり出す。", "根張りゴーレム": "根は土を割り、割れた土はまた根を抱く。", "溶鉱ゴーレム": "「溶かせば同じ。溶かせば同じ。」", "堤ゴーレム": "川をせき止めるたび、足元に小さな池が残る。", "伐採ゴーレム": "斧を二本使い潰して、ようやく丸太が一本。", "沸騰ゴーレム": "怒ると湯気が出る。もっと怒ると、火が出る。", "設計士ゴーレム": "朝いちばんに、誰も頼んでいない設計図を一枚増やしておく。", "写本ゴーレム": "濡れた指でページをめくるので、どの本も少し波打っている。", "号令ゴーレム": "「総員、整列！　……今日もひとり増えたな！」", "木簡ゴーレム": "木の板に刻んで覚える。忘れたら、薪にする。", "灯火ゴーレム": "夜更けの工房で、読み物の明かりを一手に引き受ける。", "粘土板ゴーレム": "柔らかいうちに書き、乾いてから読む。急かしても無駄だ。", "銘板ゴーレム": "自分の名前だけは、絶対に刻み間違えない。", "墨池ゴーレム": "胸の池に筆を浸せば、なんでも書ける。ただし字は汚い。", "写字生ゴーレム": "「インク代はいただきます。前払いで、二つ分」", "廃棄炉ゴーレム": "「全部いらない。……やっぱり、同じだけちょうだい」", "倉庫ゴーレム": "腹の中は棚だらけ。たまに自分でも何を入れたか忘れる。", "大蔵ゴーレム": "「鍵はない。わたしが扉だから」", "書庫ゴーレム": "背中の本棚には、まだ誰も読んでいない本が二冊ある。", "祝福ゴーレム": "新しい仲間の頭に、そっと何かを置いていく。たいてい役に立つ。", "伝令ゴーレム": "「お知らせです！　……あと、これはあなたにだけ」", "市場ゴーレム": "品物が多い日は、売り手の取り分も少し多い。", "恵みの雨ゴーレム": "雨はみんなに降る。ただ、この子の上には三倍降る。", "豊穣祭ゴーレム": "「今年もよく実った！　さあ配れ、残りはわたしの分だ！」", "篝火ゴーレム": "「BONFIRE LIT」", "大樹ゴーレム": "枝の数だけ実がなる。枝はまだ増えている。", "溶岩ゴーレム": "歩いた跡が、しばらく燃えている。", "岩盤ゴーレム": "「掘っても掘っても、まだわたしだよ」", "金脈ゴーレム": "皿に手を入れるたび、指の隙間から金がこぼれる。", "大海ゴーレム": "汲み尽くそうとした者は、まだひとりもいない。", "燎原ゴーレム": "草が増えると、なぜか機嫌がよくなる。理由は聞かないほうがいい。", "熾火ゴーレム": "消えたように見えて、ずっと赤い。", "鉱床ゴーレム": "土をひと握りもらうと、奥歯で金を噛み当てる。", "清流ゴーレム": "金貨を沈めると、水が澄む。昔からそういう川だ。", "慈雨ゴーレム": "雨粒が落ちた場所から、必ず何かが芽を出す。", "万能炉ゴーレム": "「何を入れても、何かは出てくる。何が出るかは炉の気分」", "渾沌工房": "設計図はない。材料も選ばない。それでも、ちゃんと立つ。", "双子ゴーレム": "「木がいい」「火がいい」——毎回もめるが、決まるのは早い。", "師範ゴーレム": "「教えることは教えた。あとは各自、背負える分だけ背負え」", "互助ゴーレム": "隣の工房の完成祝いに、いちばん早く駆けつける。", "灯台ゴーレム": "光はみんなを照らす。足元だけは、少し明るい。", "若芽ゴーレム": "手が空いていると、そわそわして何か拾ってくる。", "火花ゴーレム": "パチッ。——今のは、くしゃみ。", "土塊ゴーレム": "いちばん最初に作られる、いちばん丈夫なやつ。", "鉄片ゴーレム": "1日1個。3日で3個。3個拾って2個捨てる。", "水滴ゴーレム": "落ちた先で、別のものに変わる。本人は気にしていない。", "物見ゴーレム": "「遠くに何か見えます！　……カードです！」", "運び屋ゴーレム": "荷物はひとつ多めに持つ。頼まれていなくても。", "種まきゴーレム": "毎朝ひと粒。それ以上は撒かない主義。", "収穫ゴーレム": "「今日は何が採れたかな」——毎日違うものを抱えて帰ってくる", "小窯ゴーレム": "窯は小さいが、火加減の勘は一人前だ。", "継ぎ手ゴーレム": "合わない部品も、ひとひねりで合わせてしまう。", "鋳潰しゴーレム": "「おまえの分まで、次のやつが働くさ」", "森の長ゴーレム": "森が深くなるほど、声が低くなる。", "焔の長ゴーレム": "炎の一族は、長の前でだけ揺れるのをやめる。", "岳の長ゴーレム": "「山はふたつでひとつ。そういうものだ」", "鉱の長ゴーレム": "鉱夫たちは、長の咳払いひとつで掘る向きを変える。", "淵の長ゴーレム": "淵の底を知っているのは長だけ。誰も聞いたことがない。", "鶏鳴ゴーレム": "風向きを示す機能もあるらしい。", "暁鐘ゴーレム": "「暁鐘は汝の名を指し示した…。」", "原子炉ゴーレム": "原子ろ　何を食べても原子力エネルギーになる。", "焼却炉ゴーレム": "「この案は採用。燃やして暖を取る。」", "心火ゴーレム": "産声を聞くと、胸の炉がひとつ大きく鳴る。", "炉心ゴーレム": "真っ赤っ赤な光りに包まれて綺麗。", "反射炉ゴーレム": "反社炉では決してない。", "苔生工房": "長く放っておかれた工房ほど、よく働く者が育つ。", "見習鍛冶ゴーレム": "「師匠、今の見ました？　あそこ、ぼくが打ったとこです！」", "分別ゴーレム": "よく燃える設計図、燃える設計図、燃やそうと思えば燃やせる設計図。"};
+const FLAVOR={"解体ゴーレム": "「やろう。ぶっ壊してやる。」「きゃあ。ゴーレム壊し。」", "廃材ゴーレム": "廃棄された素材を、退勤後に嬉しそうに持って帰るゴーレムがいる。", "試作工房": "一体目は、いつも少し左に傾いて立つ。", "火口ゴーレム": "薪をくべる手つきだけは、どの職人より丁寧だ。", "灰掻きゴーレム": "今日は燃えカス。明日には、地面。", "鉱脈ゴーレム": "掘った土をじっと見つめ、光るものだけを拾う。", "結露ゴーレム": "冷えた鉄の肌に、朝だけ小さな湖ができる。", "水車ゴーレム": "回る。回る。川があるかぎり、回る。", "陶工ゴーレム": "ろくろの上で、弟や妹がくるくる生まれる。", "鋳造ゴーレム": "流して、冷まして、叩き出す。それが家族の作り方。", "苗木ゴーレム": "「もう一本だけ、もらってもいい？」", "種火ゴーレム": "小さな火は、拾われるのを待っている。", "粘土ゴーレム": "こねる手が止まらない。止める気もない。", "砂鉄ゴーレム": "磁石の腕を振ると、皿の底から黒い砂がついてくる。", "湧水ゴーレム": "汲めば汲むほど、足元から湧いてくる。", "芽吹きゴーレム": "仲間が生まれるたび、頭の葉が一枚増える。", "番人ゴーレム": "「よし、一体。……よし、もう一体。」", "鉄鳴りゴーレム": "新入りが立ち上がるたび、祝いの鐘の代わりに体を打ち鳴らす。", "産声ゴーレム": "生まれた子の最初の涙を、そっと瓶に集めている。", "焚火工房": "火を囲んでいると、いつのまにか誰かがひとり増えている。", "窯元ゴーレム": "「土と火があれば十分。足りない分は気合いで埋める」", "鍛造ゴーレム": "鍛てば響く。響けば生まれる。生まれれば鍛つ。", "錬水ゴーレム": "銀の器に水を張り、映った影を引きずり出す。", "根張りゴーレム": "根は土を割り、割れた土はまた根を抱く。", "溶鉱ゴーレム": "「溶かせば同じ。溶かせば同じ。」", "堤ゴーレム": "川をせき止めるたび、足元に小さな池が残る。", "伐採ゴーレム": "斧を二本使い潰して、ようやく丸太が一本。", "沸騰ゴーレム": "怒ると湯気が出る。もっと怒ると、火が出る。", "設計士ゴーレム": "朝いちばんに、誰も頼んでいない設計図を一枚増やしておく。", "写本ゴーレム": "濡れた指でページをめくるので、どの本も少し波打っている。", "号令ゴーレム": "「総員、整列！　……今日もひとり増えたな！」", "木簡ゴーレム": "木の板に刻んで覚える。忘れたら、薪にする。", "灯火ゴーレム": "夜更けの工房で、読み物の明かりを一手に引き受ける。", "粘土板ゴーレム": "柔らかいうちに書き、乾いてから読む。急かしても無駄だ。", "銘板ゴーレム": "自分の名前だけは、絶対に刻み間違えない。", "墨池ゴーレム": "胸の池に筆を浸せば、なんでも書ける。ただし字は汚い。", "写字生ゴーレム": "「インク代はいただきます。前払いで、二つ分」", "廃棄炉ゴーレム": "「全部いらない。……やっぱり、同じだけちょうだい」", "倉庫ゴーレム": "腹の中は棚だらけ。たまに自分でも何を入れたか忘れる。", "大蔵ゴーレム": "「鍵はない。わたしが扉だから」", "書庫ゴーレム": "背中の本棚には、まだ誰も読んでいない本が二冊ある。", "祝福ゴーレム": "新しい仲間の頭に、そっと何かを置いていく。たいてい役に立つ。", "伝令ゴーレム": "「お知らせです！　……あと、これはあなたにだけ」", "市場ゴーレム": "品物が多い日は、売り手の取り分も少し多い。", "恵みの雨ゴーレム": "雨はみんなに降る。ただ、この子の上には三倍降る。", "豊穣祭ゴーレム": "「今年もよく実った！　さあ配れ、残りはわたしの分だ！」", "篝火ゴーレム": "「BONFIRE LIT」", "大樹ゴーレム": "枝の数だけ実がなる。枝はまだ増えている。", "溶岩ゴーレム": "歩いた跡が、しばらく燃えている。", "岩盤ゴーレム": "「掘っても掘っても、まだわたしだよ」", "金脈ゴーレム": "皿に手を入れるたび、指の隙間から金がこぼれる。", "大海ゴーレム": "汲み尽くそうとした者は、まだひとりもいない。", "燎原ゴーレム": "草が増えると、なぜか機嫌がよくなる。理由は聞かないほうがいい。", "熾火ゴーレム": "消えたように見えて、ずっと赤い。", "鉱床ゴーレム": "土をひと握りもらうと、奥歯で金を噛み当てる。", "清流ゴーレム": "金貨を沈めると、水が澄む。昔からそういう川だ。", "慈雨ゴーレム": "雨粒が落ちた場所から、必ず何かが芽を出す。", "万能炉ゴーレム": "「何を入れても、何かは出てくる。何が出るかは炉の気分」", "双子ゴーレム": "「木がいい」「火がいい」——毎回もめるが、決まるのは早い。", "師範ゴーレム": "「教えることは教えた。あとは各自、背負える分だけ背負え」", "互助ゴーレム": "隣の工房の完成祝いに、いちばん早く駆けつける。", "灯台ゴーレム": "光はみんなを照らす。足元だけは、少し明るい。", "若芽ゴーレム": "手が空いていると、そわそわして何か拾ってくる。", "火花ゴーレム": "パチッ。——今のは、くしゃみ。", "土塊ゴーレム": "いちばん最初に作られる、いちばん丈夫なやつ。", "鉄片ゴーレム": "1日1個。3日で3個。3個拾って2個捨てる。", "水滴ゴーレム": "落ちた先で、別のものに変わる。本人は気にしていない。", "物見ゴーレム": "「遠くに何か見えます！　……カードです！」", "運び屋ゴーレム": "荷物はひとつ多めに持つ。頼まれていなくても。", "種まきゴーレム": "毎朝ひと粒。それ以上は撒かない主義。", "収穫ゴーレム": "「今日は何が採れたかな」——毎日違うものを抱えて帰ってくる", "小窯ゴーレム": "窯は小さいが、火加減の勘は一人前だ。", "継ぎ手ゴーレム": "合わない部品も、ひとひねりで合わせてしまう。", "鋳潰しゴーレム": "「おまえの分まで、次のやつが働くさ」", "森の長ゴーレム": "森が深くなるほど、声が低くなる。", "焔の長ゴーレム": "炎の一族は、長の前でだけ揺れるのをやめる。", "岳の長ゴーレム": "「山はふたつでひとつ。そういうものだ」", "鉱の長ゴーレム": "鉱夫たちは、長の咳払いひとつで掘る向きを変える。", "淵の長ゴーレム": "淵の底を知っているのは長だけ。誰も聞いたことがない。", "鶏鳴ゴーレム": "風向きを示す機能もあるらしい。", "暁鐘ゴーレム": "「暁鐘は汝の名を指し示した…。」", "原子炉ゴーレム": "原子ろ　何を食べても原子力エネルギーになる。", "焼却炉ゴーレム": "「この案は採用。燃やして暖を取る。」", "心火ゴーレム": "産声を聞くと、胸の炉がひとつ大きく鳴る。", "炉心ゴーレム": "真っ赤っ赤な光りに包まれて綺麗。", "反射炉ゴーレム": "反社炉では決してない。", "苔生工房": "長く放っておかれた工房ほど、よく働く者が育つ。", "見習鍛冶ゴーレム": "「師匠、今の見ました？　あそこ、ぼくが打ったとこです！」", "分別ゴーレム": "よく燃える設計図、燃える設計図、燃やそうと思えば燃やせる設計図。", "樹人ゴーレム": "枝を一本植えると、一晩で歩く者が生える。", "炎像ゴーレム": "「熱いうちに抱きしめな。そしたら懐くから」——炎像工房の親方", "氷像ゴーレム": "溶けないうちに名前をつけるのが、この工房の決まり。", "渾沌ゴーレム": "設計図はない。材料も選ばない。それでも、ちゃんと立つ。"};
 const ROT_SVG='<svg class="rot" viewBox="0 0 16 16" role="img" aria-label="回転マーク"><g transform="matrix(-1 0 0 1 16 0)"><path d="M3.2 9.5A5 5 0 1 0 5.3 4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M2.6 1.6v3.7h3.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></g></svg>';
 const txt=t=>esc(t).replace(/↻/g,ROT_SVG);
 const plain=t=>esc(String(t).replace(/↻/g,''));
@@ -1127,7 +1120,7 @@ function cardHTML(c,where,p){
 function findCard(uid){for(const q of G.players){const c=q.hand.find(x=>x.uid===uid)||q.tab.find(x=>x.uid===uid);if(c)return {c,q};}return null;}
 function tipHTML(c,q){
   const dup=!c.starter&&q===me()&&q.hand.includes(c)&&q.tab.some(x=>x.name===c.name);
-  return `${band(c)}<div class="in"><div class="cost">${costHTML(c.cost)}</div><div class="nm">${esc(c.name)}</div><div class="role">${esc(c.role)}${c.tapped?'・横向き（使用済み）':''}</div><div class="tx">${txt(c.text)}</div>${FLAVOR[c.name]?`<div class="flv">${esc(FLAVOR[c.name])}</div>`:''}${dup?'<div class="note">工房に同名のネームドゴーレムがいるため作れません</div>':''}</div>`;
+  return `${band(c)}<div class="in"><div class="cost">${costHTML(c.cost)}</div><div class="nm">${esc(c.name)}</div>${c.tapped?'<div class="role">横向き（使用済み）</div>':''}<div class="tx">${txt(c.text)}</div>${FLAVOR[c.name]?`<div class="flv">${esc(FLAVOR[c.name])}</div>`:''}${dup?'<div class="note">工房に同名のネームドゴーレムがいるため作れません</div>':''}</div>`;
 }
 function dishSVG(){
   const P={木:[150,48],火:[246,118],土:[209,230],金:[91,230],水:[54,118]};
@@ -1199,7 +1192,7 @@ function buildCardList(){
   const all=STARTERS.map(c=>Object.assign({n:'各自1'},c)).concat(DEFS);
   const roles=[];all.forEach(c=>{if(!roles.includes(c.role))roles.push(c.role);});
   box.className='rb-cards';
-  box.innerHTML=`<p>全${all.length}種類。枚数は山札に入っている枚数です（初期カードは全員の工房に1枚ずつ）。</p>`+roles.map(r=>`<h4>${esc(r)}</h4><ul class="clist">${all.filter(c=>c.role===r).map(c=>`<li><div class="ch"><b>${esc(c.name)}</b><span class="cst">${costHTML(c.cost)}</span>${c.starter?'':`<span class="cn">${esc(c.n)}枚</span>`}</div><div class="ct">${txt(c.text)}</div></li>`).join('')}</ul>`).join('');
+  box.innerHTML=`<p>全${all.length}種類。似た効果のカードが近くに並んでいます。枚数は山札に入っている枚数です（初期カードは全員の工房に1枚ずつ）。</p><ul class="clist">`+roles.map(r=>`${all.filter(c=>c.role===r).map(c=>`<li><div class="ch"><b>${esc(c.name)}</b><span class="cst">${costHTML(c.cost)}</span>${c.starter?'':`<span class="cn">${esc(c.n)}枚</span>`}</div><div class="ct">${txt(c.text)}</div></li>`).join('')}`).join('')+'</ul>';
 }
 function render(){
   if(typeof document==='undefined')return;hideTip();
@@ -1282,6 +1275,7 @@ async function useCard(p,c){
         {v:'sac',label:canSac?'工房のネームドゴーレム1枚を捨て札にして、1枚ドロー':'工房のネームドゴーレム1枚を捨て札にして、1枚ドロー（捨てられるゴーレムがいません）',el:null,disabled:!canSac},
         {v:'hand',label:p.hand.length?'手札1枚を捨てる':'手札1枚を捨てる（手札がありません）',el:null,disabled:!p.hand.length}],null,true);
       if(mode==='sac'){const opts=p.tab.filter(x=>!x.starter).map(x=>({v:x.uid,label:x.name,el:x.els[0]}));const v=await chooseOpt(p,'解体ゴーレム：捨て札にするネームドゴーレムを選んでください',opts,null,true);const t=p.tab.find(x=>x.uid===v);if(!t)return;
+        {const why=sacBlock(p,t);if(why){sfx('deny');G.warn=why;return;}}
         p.tab.splice(p.tab.indexOf(t),1);G.disc.push(t);draw(p,1);log(`${p.name}が${t.name}を解体して1枚ドロー`);return;}
       if(mode==='hand'){const cs=await askHand(p,'解体ゴーレム：捨てる手札を選んでください',1);if(!cs)return;discard(cs);log(`${p.name}が手札を1枚捨てた`);return;}
       return;}
@@ -1302,7 +1296,7 @@ async function useCard(p,c){
     case 'seeder':gain(p,'木');c.tapped=true;log(`${p.name}が種まきで木1を得た`);return;
     case 'reaper':{const e=await askEl(p,'収穫ゴーレム：得る素材を選んでください',E);if(e==null)return;gain(p,e);c.tapped=true;log(`${p.name}が収穫で${e}を得た`);return;}
     case 'chief':{const n=Math.floor(chiefCount(p,c.e)/2);for(let i=0;i<n;i++){G.chain=0;gain(p,c.e);}c.tapped=true;log(`${p.name}の${c.name}が${c.e}${n}を得た`);return;}
-    case 'melt':{const opts=p.tab.filter(x=>!x.starter&&x!==c).map(x=>({v:x.uid,label:x.name,el:x.els[0]}));const v=await chooseOpt(p,'鋳潰しゴーレム：捨て札にするネームドゴーレムを選んでください',opts,null,true);const t=p.tab.find(x=>x.uid===v);if(!t)return;
+    case 'melt':{const opts=p.tab.filter(x=>!x.starter&&x!==c).map(x=>({v:x.uid,label:x.name,el:x.els[0]}));const v=await chooseOpt(p,'鋳潰しゴーレム：捨て札にするネームドゴーレムを選んでください',opts,null,true);const t=p.tab.find(x=>x.uid===v);if(!t)return;{const why=sacBlock(p,t);if(why){sfx('deny');G.warn=why;return;}}
       const e=cardEls(t).length===1?cardEls(t)[0]:await askEl(p,'鋳潰しゴーレム：得る素材を選んでください',cardEls(t));if(e==null)return;p.tab.splice(p.tab.indexOf(t),1);G.disc.push(t);gain(p,e);log(`${p.name}が${t.name}を鋳潰して${e}を得た`);return;}
     case 'rooster':{const cs=await askHand(p,'鶏鳴ゴーレム：捨てる手札を選んでください',1);if(!cs)return;const t=await pickTapped();if(!t)return;discard(cs);t.tapped=false;c.tapped=true;log(`${p.name}の鶏鳴ゴーレムが${t.name}を起こした`);return;}
     case 'bell':{const cs=await askHand(p,'暁鐘ゴーレム：捨てる手札を選んでください',2);if(!cs)return;const t=await pickTapped();if(!t)return;discard(cs);t.tapped=false;log(`${p.name}の暁鐘ゴーレムが${t.name}を起こした`);return;}
