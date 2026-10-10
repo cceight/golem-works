@@ -1189,10 +1189,19 @@ function stripHTML(){
 // ルールブックのカードリスト
 function buildCardList(){
   const box=document.getElementById('rb-cardlist');if(!box)return;
-  const all=STARTERS.map(c=>Object.assign({n:'各自1'},c)).concat(DEFS);
-  const roles=[];all.forEach(c=>{if(!roles.includes(c.role))roles.push(c.role);});
+  // 得られるもの順（量産ゴーレム→素材→カード→上限→その他）。同じ効果の兄弟カードは隣同士に、属性は木火土金水の順
+  const FAM=['prod-any','prod-single','prod-small','prod-mix',
+    'inc','twin','gt','pick_lo','pick_full','chief','seeder','reaper','market','beacon','rain','harvest','bless','appr','mutual','conv','conv2','dew','joint','dismantle','dis_any','reflect','omni','dis_draw','melt',
+    'draw_round','sprout','copy','order','herald','bonfire','rburn','rburn_any','loot','reset','dig','tutor',
+    'cap','clod','porter','mentor','hcap','scout',
+    'raze','scrap','rooster','bell'];
+  const fam=c=>{if(c.k!=='prod')return c.k;const ks=Object.keys(c.pay||{});return ks.length===1&&ks[0]==='any'?'prod-any':ks.length>=3?'prod-mix':ks.includes('any')?'prod-small':'prod-single';};
+  const ei=c=>c.els.length?E.indexOf(c.els[0]):9,ct=c=>Object.values(c.cost).reduce((a,b)=>a+b,0);
+  const fi=c=>{const i=FAM.indexOf(fam(c));return i<0?999:i;};
+  const all=STARTERS.map(c=>Object.assign({n:'各自1'},c)).concat(DEFS).sort((a,b)=>fi(a)-fi(b)||(b.starter?1:0)-(a.starter?1:0)||ei(a)-ei(b)||ct(a)-ct(b));
+  const roles=[null];
   box.className='rb-cards';
-  box.innerHTML=`<p>全${all.length}種類。似た効果のカードが近くに並んでいます。枚数は山札に入っている枚数です（初期カードは全員の工房に1枚ずつ）。</p><ul class="clist">`+roles.map(r=>`${all.filter(c=>c.role===r).map(c=>`<li><div class="ch"><b>${esc(c.name)}</b><span class="cst">${costHTML(c.cost)}</span>${c.starter?'':`<span class="cn">${esc(c.n)}枚</span>`}</div><div class="ct">${txt(c.text)}</div></li>`).join('')}`).join('')+'</ul>';
+  box.innerHTML=`<p>全${all.length}種類。似た効果のカードが近くに並んでいます。枚数は山札に入っている枚数です（初期カードは全員の工房に1枚ずつ）。</p><ul class="clist">`+roles.map(r=>`${all.map(c=>`<li><div class="ch"><b>${esc(c.name)}</b><span class="cst">${costHTML(c.cost)}</span>${c.starter?'':`<span class="cn">${esc(c.n)}枚</span>`}</div><div class="ct">${txt(c.text)}</div></li>`).join('')}`).join('')+'</ul>';
 }
 function render(){
   if(typeof document==='undefined')return;hideTip();
