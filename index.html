@@ -193,6 +193,26 @@ a.btn.tw{text-decoration:none;display:inline-flex;align-items:center;background:
 a.btn.tw:hover{filter:brightness(1.1)}
 .flv{margin-top:8px;padding-top:7px;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent);font-family:var(--body);font-weight:300;font-size:12.5px;line-height:1.65;letter-spacing:.03em;color:var(--muted)}
 .rot{width:1.1em;height:1.1em;vertical-align:-.2em;margin-right:.08em;color:var(--brass)}
+.rb-cards h4{color:var(--brass);margin-top:16px}
+.rb-cards .clist{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.rb-cards .clist li{padding:7px 2px;border-bottom:1px solid var(--line);margin:0}
+.rb-cards .ch{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rb-cards .ch b{font-weight:700}
+.rb-cards .cst{display:inline-flex;gap:3px;flex-wrap:wrap}
+.rb-cards .cst .r{font-size:11.5px;padding:0 6px}
+.rb-cards .cn{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.rb-cards .ct{font-size:13px;line-height:1.6;margin-top:2px}
+.cards .card .tx{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;line-clamp:6;overflow:hidden}
+.tip.csheet{pointer-events:auto;position:fixed;left:auto;top:auto;right:16px;bottom:16px;width:320px;max-height:min(70vh,560px);display:flex;flex-direction:column;z-index:9;box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.csheet .scroll{overflow:auto;min-height:0}
+.csheet .sacts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-top:1px solid var(--line);background:color-mix(in srgb,var(--panel) 85%,#000)}
+.csheet .sacts .btn{padding:8px 14px}
+.csheet .sacts .grow{flex:1}
+.csheet .sacts .why{flex-basis:100%;font-size:11.5px;color:var(--muted)}
+.csheet .x{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:16px;line-height:1;display:grid;place-items:center;cursor:pointer;z-index:1}
+[data-tip]{cursor:pointer}
+.card.picked{outline:2px solid var(--brass);outline-offset:2px}
+.strip{display:none}
 .net{display:flex;flex-direction:column;gap:12px;max-width:520px}
 .net label{display:flex;flex-direction:column;gap:6px;font-weight:700}
 .net input{font:inherit;font-size:18px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
@@ -392,6 +412,21 @@ body{
   .dlg .opts button{font-size:14px;padding:8px 12px}
   .dlg .opts button.pickcard{width:100%}
   .tip.sheet{left:10px!important;right:10px;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:auto;max-width:none}
+  .tip.csheet{left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));width:auto;max-height:62vh}
+  .cards .card .acts{display:none}
+  .app.sheet-open{padding-bottom:46vh}
+  .grid.play .dishpanel{display:none}
+  .strip{display:flex;position:sticky;top:0;z-index:8;gap:6px;overflow-x:auto;margin:0 -10px;padding:6px 10px;background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid var(--line);scrollbar-width:none}
+  .strip::-webkit-scrollbar{display:none}
+  .strip .sp{flex:none;min-width:132px;border:1px solid var(--line);border-left:3px solid var(--pc);border-radius:8px;padding:4px 7px;background:var(--panel)}
+  .strip .sp.active{box-shadow:0 0 0 1px var(--brass)}
+  .strip .top{display:flex;gap:6px;align-items:baseline;font-size:11.5px}
+  .strip .top .nm{font-weight:700;color:var(--pc);max-width:7.5em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .strip .top .q{margin-left:auto;color:var(--muted)}
+  .strip .top .golems{font-family:var(--mono);font-weight:600;color:var(--ink);font-size:13px}
+  .strip .rs{display:flex;gap:3px;margin-top:2px}
+  .strip .rs .r{font-size:11px;padding:0 4px;border-radius:5px}
+  .strip .rs .r .k{margin-right:1px}
   .setup{margin:16px auto}
 }
 </style>
@@ -407,7 +442,7 @@ body{
 <div class="rb-scrim" id="rb-scrim" data-act="rules-close" hidden></div>
 <aside class="rulebook" id="rulebook" role="dialog" aria-modal="true" aria-labelledby="rb-title" hidden>
   <div class="rb-head"><h2 id="rb-title">ルールブック</h2><span class="spacer"></span><button class="btn" data-act="rules-close" id="rb-close">閉じる</button></div>
-  <nav class="rb-toc" aria-label="ルールブックの目次"><a href="#rb-overview">概要</a><a href="#rb-round">ラウンドの流れ</a><a href="#rb-turn">ターンでできること</a><a href="#rb-named">ネームドゴーレム</a><a href="#rb-win">勝利条件</a><a href="#rb-terms">用語</a></nav>
+  <nav class="rb-toc" aria-label="ルールブックの目次"><a href="#rb-overview">概要</a><a href="#rb-round">ラウンドの流れ</a><a href="#rb-turn">ターンでできること</a><a href="#rb-named">ネームドゴーレム</a><a href="#rb-win">勝利条件</a><a href="#rb-terms">用語</a><a href="#rb-cards">カードリスト</a></nav>
   <div class="rb-body" id="rb-body">
     <section id="rb-overview"><h3>概要</h3>
       <p>ゴーレムがゴーレムを作る工房を組み上げ、最初に無限ループを完成させたプレイヤーが勝ちます。12ラウンド以内に誰も完成しなければ、量産ゴーレムが最も多いプレイヤーの勝ちです。</p>
@@ -435,7 +470,7 @@ body{
       <p>行動はすべて、手札からネームドゴーレムを作ることと、工房のゴーレムの効果を使うことです。最初から工房にいる3枚が基本の行動になります。</p>
       <div class="rb-tbl"><table><thead><tr><th>行動</th><th>内容</th></tr></thead><tbody>
         <tr><td>ネームドゴーレムを作る</td><td>手札のカードのコストを素材で払い、工房に置く。足りない素材は工房の変換ゴーレムで自動的に補う</td></tr>
-        <tr><td>解体ゴーレム（初期）</td><td>手札2枚を捨てて、捨てたどちらかの属性の素材1を得る。無色のカードは好きな属性として扱う</td></tr>
+        <tr><td>解体ゴーレム（初期）</td><td>次のどちらかを選ぶ。工房のネームドゴーレム1枚を捨て札にして1枚ドロー、または手札1枚を捨てる（初期カードは捨て札にできない）</td></tr>
         <tr><td>廃材ゴーレム（初期）</td><td>好きな素材1を捨てる。上限で詰まったときの逃げ道</td></tr>
         <tr><td>試作工房（初期）</td><td>好きな素材4を払い、量産ゴーレム+1</td></tr>
         <tr><td>ループ宣言</td><td>量産が止まらない工房なら自動で証明する。横向きの起こし直しなどを使うループは、宣言後に一周回して「一周完了」を押す</td></tr>
@@ -460,7 +495,8 @@ body{
         <tr><td>強化</td><td>素材所持上限や手札上限を上げる</td><td>倉庫ゴーレム：素材所持上限+2</td></tr>
         <tr><td>共有</td><td>全員に配りつつ、自分はより多く得る</td><td>恵みの雨ゴーレム：全員水1、自分は水3</td></tr>
         <tr><td>軽量</td><td>コスト1〜2の序盤向けカード</td><td>物見ゴーレム、収穫ゴーレム</td></tr>
-        <tr><td>解体（上位）</td><td>解体ゴーレムの強化版</td><td>図面焼却炉、万能炉ゴーレム</td></tr>
+        <tr><td>解体</td><td>手札2枚を捨てて、捨てたどちらかの属性の素材1を得る。無色のカードは好きな属性として扱う</td><td>分別ゴーレム</td></tr>
+        <tr><td>解体（上位）</td><td>分別ゴーレムの強化版</td><td>図面焼却炉、万能炉ゴーレム</td></tr>
         <tr><td>長</td><td>同じ属性のネームドゴーレム2枚につき素材1</td><td>森の長ゴーレム</td></tr>
         <tr><td>再利用・起こし</td><td>工房のゴーレムを素材に戻す、横向きを縦向きに戻す</td><td>鋳潰しゴーレム、鶏鳴ゴーレム、暁鐘ゴーレム</td></tr>
       </tbody></table></div>
@@ -483,6 +519,7 @@ body{
         <tr><td>ドラフトで取る</td><td>素材ドラフトで皿から1個取ること。取得誘発はこれにだけ反応する</td></tr>
         <tr><td>得る</td><td>ドラフト、ボーナス、変換、効果など、あらゆる入手。獲得誘発はこちらに反応する</td></tr>
       </tbody></table></div></section>
+    <section id="rb-cards"><h3>カードリスト</h3><div id="rb-cardlist"></div></section>
   </div>
 </aside>
 <script>
@@ -508,6 +545,7 @@ d('水車ゴーレム','木2','conv',{f:'水',t:'木'},4,'変換','水1→木1')
 [['焚火工房','木'],['窯元ゴーレム','火'],['鍛造ゴーレム','土'],['錬水ゴーレム','金'],['苔むし工房','水']].forEach(([n,e])=>d(n,e+'3','prod',{pay:{[e]:1,[nx(e)]:1,any:1}},2,'生産(混成)',`${e}1と${nx(e)}1と好きな素材1を払い、量産ゴーレム+1`));
 [['根張り','木'],['溶鉱','火'],['堤','土'],['伐採','金'],['沸騰','水']].forEach(([n,e])=>d(n+'ゴーレム',e+'2','conv2',{f:e,t:nx(nx(e))},2,'変換(相剋)',`${e}2→${nx(nx(e))}1`));
 d('設計士ゴーレム','木2','draw_round',{},3,'ドロー','ラウンド開始時、追加で1枚ドロー');
+d('分別ゴーレム','無1','dismantle',{},3,'解体','手札2枚を捨てて、捨てたどちらかの属性の素材1を得る（何度でも）');
 d('図面焼却炉','火4','dis_draw',{},2,'解体(上位)','手札2枚を捨てて、捨てたどちらかの属性の素材1を得て、1枚ドロー（何度でも）');
 d('写本ゴーレム','水5','copy',{},2,'ドロー','水を得るたび、1枚ドロー');
 d('号令ゴーレム','金4','order',{},2,'ドロー','量産ゴーレムが増えるたび、1枚ドロー');
@@ -550,7 +588,7 @@ d('鶏鳴ゴーレム','火1水1無1','rooster',{},2,'起こし','↻カード�
 d('暁鐘ゴーレム','木2火1土1金1水1','bell',{},1,'起こし','手札2枚を捨てて、工房の別のネームドゴーレム1枚を縦向きに戻す（何度でも）');
 DEFS.forEach(x=>{x.els=Object.keys(x.cost).filter(k=>k!=='any');x.text=x.text.replace(/を得る(?!たび)/g,'を得ることができる');});
 const STARTERS=[
-  {name:'解体ゴーレム',cost:{},k:'dismantle',role:'初期',text:'手札2枚を捨てて、捨てたどちらかの属性の素材1を得る（何度でも）'},
+  {name:'解体ゴーレム',cost:{},k:'raze',role:'初期',text:'次のどちらかを選ぶ（何度でも）：工房のネームドゴーレム1枚を捨て札にして、1枚ドロー／手札1枚を捨てる'},
   {name:'廃材ゴーレム',cost:{},k:'scrap',role:'初期',text:'好きな素材1を捨てる（何度でも）'},
   {name:'試作工房',cost:{},k:'prod',pay:{any:4},role:'初期',text:'好きな素材4を払い、量産ゴーレム+1'}];
 STARTERS.forEach(x=>{x.els=[];x.starter=true;x.text=x.text.replace(/を得る(?!たび)/g,'を得ることができる');});
@@ -710,7 +748,7 @@ function golemBackSVG(){
   return `<svg class="golem-art back" viewBox="300 630 920 920" aria-hidden="true"><g transform="translate(1520 0) scale(-1 1)"><g stroke="#141210" stroke-width="12" stroke-linejoin="round">${G_LEGS_STAND}${G_ARMS}${G_BODY}</g></g><path d="${G_BACK_VEINS}" fill="none" stroke="#0c0a09" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><path d="${G_BACK_VEINS}" fill="none" stroke="#b98aff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><g stroke="#141210" stroke-width="12" stroke-linejoin="round">${GSTONE('M578 916 Q566 840 584 764 Q610 676 704 654 Q800 640 866 690 Q930 748 936 830 Q940 880 930 916 Q760 940 578 916 Z')}</g><path d="M600 900 Q760 918 918 898" fill="none" stroke="#141210" stroke-width="10" stroke-linecap="round" opacity=".55"/></svg>`;
 }
 function hopGolem(uid,delay,onArrive){
-  const srcEl=document.querySelector(`[data-tip="${uid}"]`);
+  const srcEl=[...document.querySelectorAll(`[data-tip="${uid}"]`)].find(e=>{const r=e.getBoundingClientRect();return r.width||r.height;});
   const src=fxPoint(`[data-tip="${uid}"]`);if(!src||!srcEl)return false;
   // 行き先：CPUの行なら行内の量産数、自分なら工房見出しの座りゴーレム
   const row=srcEl.closest('[data-pl]');
@@ -838,7 +876,7 @@ async function dismantle(p,cards,mode){
   G.chain=0;gain(p,e);log(`${p.name}が手札2枚を解体して${e}を得た${mode==='draw'?'（さらに1枚ドロー）':''}`);
   if(mode==='draw')draw(p,1);
 }
-function fxPoint(sel){const el=document.querySelector(sel);if(!el)return null;const r=el.getBoundingClientRect();if(!r.width&&!r.height)return null;return {x:r.left+r.width/2,y:r.top+r.height/2};}
+function fxPoint(sel){for(const el of document.querySelectorAll(sel)){const r=el.getBoundingClientRect();if(r.width||r.height)return {x:r.left+r.width/2,y:r.top+r.height/2};}return null;}
 function fxDot(e,from,to,delay,kind){
   const d=document.createElement('div');d.className='fx-dot';d.style.background=`var(--${EK[e]})`;d.style.color=`var(--${EK[e]})`;d.style.left=(from.x-9)+'px';d.style.top=(from.y-9)+'px';
   document.body.appendChild(d);
@@ -899,7 +937,7 @@ function proofOk(p,s){return p.golems>s.golems&&E.every(e=>p.res[e]>=s.res[e])&&
 function value(p,c){
   const k=c.k,tab=p.tab,rnd=G.round,prods=tab.filter(x=>x.k==='prod'&&!x.starter),incs=tab.filter(x=>x.k==='inc'||x.k==='twin');
   if(tab.some(x=>x.name===c.name))return -5;
-  const base={prod:prods.length?3:7,inc:8,twin:8,conv:2,conv2:3,pick_lo:rnd<=4?6:1,pick_full:rnd<=6?7:2,gt:5,draw_round:rnd<=4?6:1,dis_draw:3,copy:3,order:3,reset:1,cap:rnd<=6?4:2,hcap:1,bless:rnd<=5?5:1,appr:rnd<=4?4:1,dis_any:3,rburn:3,rburn_any:3,herald:rnd<=6?5:2,market:rnd<=6?5:2,rain:4,harvest:5,bonfire:5,mentor:rnd<=6?5:2,mutual:rnd<=6?4:1,beacon:rnd<=6?6:2,
+  const base={prod:prods.length?3:7,inc:8,twin:8,conv:2,conv2:3,pick_lo:rnd<=4?6:1,pick_full:rnd<=6?7:2,gt:5,draw_round:rnd<=4?6:1,dis_draw:3,dismantle:rnd<=6?6:3,copy:3,order:3,reset:1,cap:rnd<=6?4:2,hcap:1,bless:rnd<=5?5:1,appr:rnd<=4?4:1,dis_any:3,rburn:3,rburn_any:3,herald:rnd<=6?5:2,market:rnd<=6?5:2,rain:4,harvest:5,bonfire:5,mentor:rnd<=6?5:2,mutual:rnd<=6?4:1,beacon:rnd<=6?6:2,
     sprout:rnd<=4?5:1,loot:3,clod:rnd<=5?5:2,dig:5,dew:2,scout:4,porter:rnd<=5?5:2,seeder:rnd<=5?5:1,reaper:rnd<=5?6:2,joint:2,melt:3,chief:2+2*(c.e?chiefCount(p,c.e):0),rooster:3,bell:4};
   let v=base[k]??2;
   if(k==='inc'&&prods.length)v+=2;
@@ -945,8 +983,10 @@ async function cpuTurn(p){
       G.chain=0;if((await build(p,c))===true){built=true;checkOverflow();render();await sleep(240);break;}}
     if(!built||G.over||G.token!==tk)break;}};
   await buildPass();if(G.over||G.token!==tk)return;
-  const mode=has(p,'dis_any').length?'any':has(p,'dis_draw').length?'draw':'base';
-  for(let i=0;i<2;i++){const full=p.hand.length>=p.hcap;const low=p.hand.filter(c=>full||value(p,c)<4).sort((a,b)=>value(p,a)-value(p,b));if(low.length<2||(tot(p.res)>=p.cap&&!full))break;await dismantle(p,low.slice(0,2),mode);}
+  const mode=has(p,'dis_any').length?'any':has(p,'dis_draw').length?'draw':has(p,'dismantle').length?'base':null;
+  for(let i=0;i<2&&mode;i++){const full=p.hand.length>=p.hcap;const low=p.hand.filter(c=>full||value(p,c)<4).sort((a,b)=>value(p,a)-value(p,b));if(low.length<2||(tot(p.res)>=p.cap&&!full))break;await dismantle(p,low.slice(0,2),mode);}
+  // 手札が上限で詰まったら、解体ゴーレムで価値の低い手札を1枚捨てて次のドローに備える
+  if(has(p,'raze').length&&p.hand.length>=p.hcap){const junk=p.hand.slice().sort((a,b)=>value(p,a)-value(p,b))[0];if(junk&&value(p,junk)<3){p.hand.splice(p.hand.indexOf(junk),1);G.disc.push(junk);log(`${p.name}が手札を1枚捨てた`);}}
   const dd=desire(p);
   for(const c of has(p,'rburn'))while(p.res[c.e]>0&&dd[c.e]===0&&p.hand.length<p.hcap){p.res[c.e]--;draw(p,1);log(`${p.name}が${c.e}を支払ってドロー`);}
   await buildPass();if(G.over||G.token!==tk)return;
@@ -1028,6 +1068,7 @@ function tabActs(p,c){
   let ok=false;
   switch(c.k){
     case 'dismantle':case 'dis_draw':case 'dis_any':ok=h>=2;break;
+    case 'raze':ok=h>=1||p.tab.some(x=>!x.starter);break;
     case 'scrap':ok=tot(p.res)>0;break;
     case 'conv':ok=p.res[c.f]>=1;break;
     case 'conv2':ok=p.res[c.f]>=2;break;
@@ -1050,7 +1091,7 @@ function artColor(c){return c.els.length?`var(--${EK[c.els[0]]})`:c.starter?'var
 function costDots(cost){return Object.keys(cost).map(e=>`<span class="cd" style="--c:var(--${e==='any'?'none':EK[e]})" title="${e==='any'?'好きな素材':e}${cost[e]}">${cost[e]}</span>`).join('');}
 function cardHTML(c,where,p){
   const can=where==='hand'&&myTurn()&&!p.tab.some(x=>x.name===c.name)&&canPay(p.tab,p.res,c.cost);
-  const cls=['card',c.tapped?'tapped':'',c.starter?'starter':'',where==='hand'&&G.sel.has(c.uid)?'sel':'',can?'can':''].join(' ');
+  const cls=['card',SHEET===c.uid?'picked':'',c.tapped?'tapped':'',c.starter?'starter':'',where==='hand'&&G.sel.has(c.uid)?'sel':'',can?'can':''].join(' ');
   const tact=where==='tab'?tabActs(p,c):'';
   const ready=myTurn()&&(can||(tact&&!tact.includes('disabled')&&c.k!=='scrap'));
   const acts=`${where==='hand'&&myTurn()?`<button class="btn small" data-act="build" data-uid="${c.uid}" ${can?'':'disabled'}>作る</button>`:''}${tact}`;
@@ -1098,7 +1139,7 @@ let DETAIL_UID=null;
 function detailHTML(){const f=DETAIL_UID!=null&&findCard(DETAIL_UID);return f?tipHTML(f.c,f.q):'<p class="empty">カードにマウスを乗せると、ここに詳細が出ます。</p>';}
 function hideTip(){const t=document.getElementById('tip');if(t)t.hidden=true;}
 function showTip(el){
-  if(!G)return;const f=findCard(+el.dataset.tip);if(!f)return hideTip();
+  if(!G)return;if(SHEET===+el.dataset.tip)return hideTip();const f=findCard(+el.dataset.tip);if(!f)return hideTip();
   const dp=document.getElementById('detail');
   if(dp){DETAIL_UID=f.c.uid;dp.innerHTML=tipHTML(f.c,f.q);return;}
   const t=document.getElementById('tip');t.innerHTML=tipHTML(f.c,f.q);t.hidden=false;
@@ -1108,6 +1149,33 @@ function showTip(el){
   let x=r.right+10;if(x+w>vw-8)x=r.left-w-10;if(x<8)x=Math.min(vw-w-8,Math.max(8,r.left));
   let y=Math.min(Math.max(8,r.top),vh-h-8);t.style.left=x+'px';t.style.top=y+'px';
 }
+// ---- カード詳細シート（押したカードを固定位置に出して、起動・作る・並べ替えをここで行う） ----
+let SHEET=null;
+function sheetHTML(){
+  if(SHEET==null)return '';const f=findCard(SHEET);if(!f)return '';
+  const {c,q}=f,p=me(),mine=q===p;let acts='';
+  if(mine&&q.hand.includes(c)){
+    const can=myTurn()&&!q.tab.some(x=>x.name===c.name)&&canPay(q.tab,q.res,c.cost);
+    const why=!myTurn()?'自分のターンに作れます':q.tab.some(x=>x.name===c.name)?'工房に同名のネームドゴーレムがいます':!canPay(q.tab,q.res,c.cost)?'素材が足りません':'';
+    acts=`<button class="btn primary" data-act="build" data-uid="${c.uid}" ${can?'':'disabled'}>作る</button>${why?`<span class="why">${esc(why)}</span>`:''}`;
+  }else if(mine&&q.tab.includes(c)){
+    const i=q.tab.indexOf(c),use=tabActs(q,c).replace('btn small','btn primary');
+    acts=`${use||(c.k==='prod'||!myTurn()?'':'')}<span class="grow"></span><button class="btn" data-act="move" data-uid="${c.uid}" data-dir="-1" ${i<=0?'disabled':''} aria-label="左へ動かす">←</button><button class="btn" data-act="move" data-uid="${c.uid}" data-dir="1" ${i>=q.tab.length-1?'disabled':''} aria-label="右へ動かす">→</button>${!use&&!myTurn()?'<span class="why">起動は自分のターンにできます。並べ替えはいつでもできます</span>':''}`;
+  }
+  return `<div class="tip csheet" role="dialog" aria-label="${esc(c.name)}の詳細"><button class="x" data-act="sheet-close" aria-label="閉じる">×</button><div class="scroll">${tipHTML(c,q)}</div>${acts?`<div class="sacts">${acts}</div>`:''}</div>`;
+}
+// スマホ用：上に固定する工房の状況
+function stripHTML(){
+  return `<div class="strip" aria-label="工房の状況">${G.players.map(p=>`<div class="sp ${G.cur===p?'active':''}" data-pl="${p.i}" style="--pc:${pc(p.i)}"><div class="top"><span class="nm">${esc(p.name)}</span><span class="q">量産 <span class="golems">${fmtG(dispG(p))}</span></span></div><div class="rs">${E.map(e=>`<span class="r e-${EK[e]}" data-res="${e}"><span class="k">${e}</span>${p.res[e]}</span>`).join('')}</div></div>`).join('')}</div>`;
+}
+// ルールブックのカードリスト
+function buildCardList(){
+  const box=document.getElementById('rb-cardlist');if(!box)return;
+  const all=STARTERS.map(c=>Object.assign({n:'各自1'},c)).concat(DEFS);
+  const roles=[];all.forEach(c=>{if(!roles.includes(c.role))roles.push(c.role);});
+  box.className='rb-cards';
+  box.innerHTML=`<p>全${all.length}種類。枚数は山札に入っている枚数です（初期カードは全員の工房に1枚ずつ）。</p>`+roles.map(r=>`<h4>${esc(r)}</h4><ul class="clist">${all.filter(c=>c.role===r).map(c=>`<li><div class="ch"><b>${esc(c.name)}</b><span class="cst">${costHTML(c.cost)}</span>${c.starter?'':`<span class="cn">${esc(c.n)}枚</span>`}</div><div class="ct">${txt(c.text)}</div></li>`).join('')}</ul>`).join('');
+}
 function render(){
   if(typeof document==='undefined')return;hideTip();
   const app=document.getElementById('app');
@@ -1116,7 +1184,9 @@ function render(){
   const ins=instr();
   app.classList.add('game');
   {const gp=(me()||G.players[0]).golems;G.gearSpin=G.lastGolems!=null&&gp>G.lastGolems?!G.gearSpin:G.gearSpin;G.lastGolems=gp;}
-  app.innerHTML=`<div class="instr ${ins.mine?'mine':''}"><div class="instr-text" role="status" aria-live="polite"><b>${esc(ins.t)}</b><span>${esc(ins.d)}</span></div><div class="instr-acts">${myTurn()?(G.proof?`<button class="btn" data-act="proof-cancel">証明をやめる</button><button class="btn primary" data-act="proof-done">一周完了</button>`:`<button class="btn" data-act="declare">ループ宣言</button><button class="btn primary" data-act="end">ターン終了</button>`):''}</div></div>
+  if(SHEET!=null&&!findCard(SHEET))SHEET=null;
+  app.classList.toggle('sheet-open',SHEET!=null);
+  app.innerHTML=`${stripHTML()}<div class="instr ${ins.mine?'mine':''}"><div class="instr-text" role="status" aria-live="polite"><b>${esc(ins.t)}</b><span>${esc(ins.d)}</span></div><div class="instr-acts">${myTurn()?(G.proof?`<button class="btn" data-act="proof-cancel">証明をやめる</button><button class="btn primary" data-act="proof-done">一周完了</button>`:`<button class="btn" data-act="declare">ループ宣言</button><button class="btn primary" data-act="end">ターン終了</button>`):''}</div></div>
   <header class="top"><h1 class="brand">UNLIMITED GOLEM WORKS<small>無限ゴーレム工房</small></h1>
     <div class="meter"><span class="chip">ラウンド <b>${G.round}${G.solo?'':' / 12'}</b></span><span class="chip">山札 <b>${G.deck.length}</b></span><span class="chip">捨て札 <b>${G.disc.length}</b></span><span class="chip">スタート <b>${esc(G.players[G.start].name)}</b></span></div>
     <span class="spacer"></span><button class="btn toggle" data-act="sound" aria-pressed="${SOUND}">効果音 ${SOUND?'オン':'オフ'}</button><button class="btn" data-act="rules">ルール</button><button class="btn" data-act="quit">${NET?'部屋を出る':'<span class="lg">モード選択へ</span>戻る'}</button></header>
@@ -1132,8 +1202,8 @@ function render(){
     <aside class="col logcol rightband"><section class="panel dishpanel"><h2>素材皿<span class="sub">隣の皿へだけ動ける</span></h2>${dishSVG()}</section><section class="panel"><h2>工房の状況<span class="sub">全プレイヤー</span></h2>${playersHTML()}</section>
       <section class="panel"><h2>記録</h2><div class="log">${G.log.map(l=>`<div class="ln ${l.cls}">${esc(l.t)}</div>`).join('')}</div></section></aside>
   </div>
-  ${G.modal&&(G.modal.owner==null||G.players[G.modal.owner]===me())?`<div class="overlay"><div class="dlg ${G.modal.opts.some(o=>o.card)?'wide':''}" role="dialog" aria-modal="true"><h3>${esc(G.modal.title)}</h3><div class="opts">${G.modal.opts.map((o,i)=>o.card?`<button class="pickcard" data-act="choose" data-i="${i}">${tipHTML(o.card,p)}</button>`:`<button class="e-${ek(o.el)}" data-act="choose" data-i="${i}">${esc(o.label)}</button>`).join('')}</div>${G.modal.cancel?'<div class="bar"><button class="btn" data-act="choose-cancel">キャンセル</button></div>':''}</div></div>`:''}
-  ${G.over&&!G.over.closed?overHTML():''}${netBar()}`;
+  ${G.modal&&(G.modal.owner==null||G.players[G.modal.owner]===me())?`<div class="overlay"><div class="dlg ${G.modal.opts.some(o=>o.card)?'wide':''}" role="dialog" aria-modal="true"><h3>${esc(G.modal.title)}</h3><div class="opts">${G.modal.opts.map((o,i)=>o.card?`<button class="pickcard" data-act="choose" data-i="${i}">${tipHTML(o.card,p)}</button>`:`<button class="e-${ek(o.el)}" data-act="choose" data-i="${i}" ${o.disabled?'disabled':''}>${esc(o.label)}</button>`).join('')}</div>${G.modal.cancel?'<div class="bar"><button class="btn" data-act="choose-cancel">キャンセル</button></div>':''}</div></div>`:''}
+  ${sheetHTML()}${G.over&&!G.over.closed?overHTML():''}${netBar()}`;
   netAfterRender();
   if(!G.fxPrev){G.fxPrev={};G.players.forEach(q=>G.fxPrev[q.i]=Object.assign({},q.res));G.fxq=[];}
   else requestAnimationFrame(playFx);
@@ -1181,6 +1251,15 @@ async function useCard(p,c){
       const e=els.length===1?els[0]:await askEl(p,`${c.name}：得る素材を選んでください`,els);if(e==null)return;
       discard(cs);G.chain=0;gain(p,e);if(c.k==='dis_draw')draw(p,1);
       log(`${p.name}が手札2枚を解体して${e}を得た${c.k==='dis_draw'?'（さらに1枚ドロー）':''}`);return;}
+    case 'raze':{
+      const canSac=p.tab.some(x=>!x.starter);
+      const mode=await chooseOpt(p,'解体ゴーレム：どちらを使いますか',[
+        {v:'sac',label:canSac?'工房のネームドゴーレム1枚を捨て札にして、1枚ドロー':'工房のネームドゴーレム1枚を捨て札にして、1枚ドロー（捨てられるゴーレムがいません）',el:null,disabled:!canSac},
+        {v:'hand',label:p.hand.length?'手札1枚を捨てる':'手札1枚を捨てる（手札がありません）',el:null,disabled:!p.hand.length}],null,true);
+      if(mode==='sac'){const opts=p.tab.filter(x=>!x.starter).map(x=>({v:x.uid,label:x.name,el:x.els[0]}));const v=await chooseOpt(p,'解体ゴーレム：捨て札にするネームドゴーレムを選んでください',opts,null,true);const t=p.tab.find(x=>x.uid===v);if(!t)return;
+        p.tab.splice(p.tab.indexOf(t),1);G.disc.push(t);draw(p,1);log(`${p.name}が${t.name}を解体して1枚ドロー`);return;}
+      if(mode==='hand'){const cs=await askHand(p,'解体ゴーレム：捨てる手札を選んでください',1);if(!cs)return;discard(cs);log(`${p.name}が手札を1枚捨てた`);return;}
+      return;}
     case 'scrap':{const e=await askEl(p,'廃材ゴーレム：捨てる素材を選んでください',E.filter(x=>p.res[x]>0));if(e==null)return;p.res[e]--;log(`${p.name}が${e}を1つ捨てた`);return;}
     case 'conv':case 'conv2':{const k=c.k==='conv2'?2:1;if(p.res[c.f]<k)return;p.res[c.f]-=k;gain(p,c.t);log(`${p.name}が${c.f}${k}を${c.t}1に変換した`);return;}
     case 'prod':{if(!canPay(p.tab,p.res,c.pay))return;if(!(await payReal(p,c.pay,c.name)))return;p.golems++;if(fxOn()){G.gPend[p.i]=(G.gPend[p.i]||0)+1;if(G.fxHop.length<6)G.fxHop.push(c.uid);}fireInc(realSt(p));for(const _ of has(p,'order'))draw(p,1);sfx('golem');log(`${p.name}が量産ゴーレムを作った（計${p.golems}体）`);return;}
@@ -1200,13 +1279,14 @@ async function useCard(p,c){
     case 'bell':{const cs=await askHand(p,'暁鐘ゴーレム：捨てる手札を選んでください',2);if(!cs)return;const t=await pickTapped();if(!t)return;discard(cs);t.tapped=false;log(`${p.name}の暁鐘ゴーレムが${t.name}を起こした`);return;}
   }
 }
-const GAME_ACTS=['choose','choose-cancel','dish','build','use','declare','proof-done','proof-cancel','end'];
+const GAME_ACTS=['choose','choose-cancel','dish','build','use','declare','proof-done','proof-cancel','end','move'];
 let ACT_P=null;
 // 盤面への操作（ローカルのクリックと、オンラインのゲストから届いた操作の両方がここを通る）
 function handleAct(a,d,p){
-  if(a==='choose'&&G.modal&&G.modal.owner===p.i){const m=G.modal,o=m.opts[+d.i];if(!o)return;G.modal=null;m.res(o.v);render();return;}
+  if(a==='choose'&&G.modal&&G.modal.owner===p.i){const m=G.modal,o=m.opts[+d.i];if(!o||o.disabled)return;G.modal=null;m.res(o.v);render();return;}
   if(a==='choose-cancel'&&G.modal&&G.modal.owner===p.i&&G.modal.cancel){const m=G.modal;G.modal=null;m.res(null);render();return;}
   if(a==='dish'){if(G.pickRes&&G.cur===p&&G.allowed.includes(d.e))G.pickRes(d.e);return;}
+  if(a==='move'){if(G.busy)return;const i=p.tab.findIndex(c=>c.uid===+d.uid),j=i+(+d.dir>0?1:-1);if(i<0||j<0||j>=p.tab.length)return;[p.tab[i],p.tab[j]]=[p.tab[j],p.tab[i]];render();return;}
   if(!turnOk(p))return;
   ACT_P=p;
   const card=u=>p.hand.find(c=>c.uid===+u)||p.tab.find(c=>c.uid===+u);
@@ -1363,9 +1443,15 @@ document.querySelector('.rb-toc').addEventListener('click',ev=>{const a=ev.targe
 const NOHOVER=matchMedia('(hover: none)').matches;
 document.addEventListener('mouseover',ev=>{if(NOHOVER)return;const el=ev.target.closest('[data-tip]');if(el)showTip(el);else hideTip();});
 document.addEventListener('focusin',ev=>{if(NOHOVER)return;const el=ev.target.closest('[data-tip]');if(el)showTip(el);else hideTip();});
-document.addEventListener('click',ev=>{if(!NOHOVER)return;const el=ev.target.closest('[data-tip]');if(el&&!ev.target.closest('button'))showTip(el);else hideTip();},true);
+document.addEventListener('click',ev=>{
+  if(!G)return;const t=ev.target;
+  if(t.closest('.csheet')||t.closest('.overlay')||t.closest('.rulebook'))return;
+  const el=t.closest('[data-tip]');
+  if(el&&!t.closest('button')){SHEET=+el.dataset.tip;hideTip();render();return;}
+  if(SHEET!=null&&!t.closest('[data-act]')){SHEET=null;render();}
+},true);
 document.addEventListener('scroll',hideTip,true);
-document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='net-code'){ev.preventDefault();netUi('net-join');return;}if(ev.key==='Enter'&&ev.target.id==='net-name'){ev.preventDefault();netUi('net-create');return;}if(ev.key==='Escape'&&RB_OPEN){closeRules();return;}if((ev.key==='Enter'||ev.key===' ')&&ev.target.matches('[data-act][tabindex]')){ev.preventDefault();ev.target.click();}});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&SHEET!=null&&!RB_OPEN){SHEET=null;render();return;}if((ev.key==='Enter'||ev.key===' ')&&G&&ev.target.matches('[data-tip]:not([data-act])')){ev.preventDefault();SHEET=+ev.target.dataset.tip;hideTip();render();setTimeout(()=>document.querySelector('.csheet .x')?.focus(),0);return;}if(ev.key==='Enter'&&ev.target.id==='net-code'){ev.preventDefault();netUi('net-join');return;}if(ev.key==='Enter'&&ev.target.id==='net-name'){ev.preventDefault();netUi('net-create');return;}if(ev.key==='Escape'&&RB_OPEN){closeRules();return;}if((ev.key==='Enter'||ev.key===' ')&&ev.target.matches('[data-act][tabindex]')){ev.preventDefault();ev.target.click();}});
 document.addEventListener('click',ev=>{
   const t=ev.target.closest('[data-act]');if(!t)return;const a=t.dataset.act;
   if(a==='sound'){SOUND=!SOUND;try{localStorage.setItem('golem-sound',SOUND?'on':'off');}catch(e){}if(SOUND)sfx('tap');render();return;}
@@ -1376,14 +1462,16 @@ document.addEventListener('click',ev=>{
   if(a==='pick-cpu'){SETUP_STEP='cpu';render();return;}
   if(a==='pick-back'){SETUP_STEP='mode';render();return;}
   if(a==='start'){SETUP_STEP='mode';newGame(+t.dataset.n);return;}
+  if(a==='sheet-close'){SHEET=null;render();return;}
   if(a.startsWith('net-')){netUi(a,t);return;}
   if(a==='quit'){if(NET){netLeave();return;}if(!G)return;G.token={};G=null;render();return;}
   if(!G)return;
   if(a==='close'){G.over.closed=true;render();return;}
-  if(GAME_ACTS.includes(a)){const d={i:t.dataset.i,e:t.dataset.e,uid:t.dataset.uid};
+  if(GAME_ACTS.includes(a)){const d={i:t.dataset.i,e:t.dataset.e,uid:t.dataset.uid,dir:t.dataset.dir};if(a==='build')SHEET=null;
     if(NET&&NET.role==='guest'){if(a==='build'||a==='end')G.sel.clear();netSend({t:'act',a,d});return;}
     const p=me();if(p)handleAct(a,d,p);}
 });
+buildCardList();
 {const rc=store.sget('golem-room');if(rc&&/^[A-Z0-9]{4}$/.test(rc))netStart('guest',rc,store.get('golem-name',''));else render();}
 }
 if(typeof module!=='undefined')module.exports={newGame,get G(){return G},DEFS};
